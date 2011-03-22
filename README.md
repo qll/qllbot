@@ -18,13 +18,13 @@ source. I recommend compiling it without libiconv which caused a lot of problems
 with my SILC Toolkit.  
 	$ ./configure --without-iconv
 	$ make
-	\# make install
+	# make install
 This should install everything needed. Now you have to compile pysilc without
 iconv. Just change the line <code>libraries = ['iconv', 'silc', 'silcclient'],</code>
 into <code>libraries = ['silc', 'silcclient']</code> in setup.py. This caused
 no problems with my installation, yet. Now build and install:  
 	$ python setup.py build
-	\# python setup.py install
+	# python setup.py install
   
 qllbot should work out of the box now. Just edit your settings.py and run it in
 a terminal. Everything should work fine now.  
@@ -42,16 +42,16 @@ As written in the description of this project qllbot wants to provide an easy
 way of writing modules. Nobody knows what functionality you might expect from a
 bot, but with a little knowledge of Python you can write powerful modules yourself.  
   
-First, let me give you a small overview: Modules are files in the ./modules/ directory.
-They contain one or more commands which are grouped together through this system. If
-we take a look into the basic.py module, you can see three commands which are
+First, let me give you a small overview: Modules are files in the ./modules/ directory
+and they contain one or more commands. If
+you take a look into the basic.py module, you can see three commands which are
 represented by functions (get_time, calculate, say). Commands react to a certain
-syntax in the chat room, like hashtag (#) + command keyword (e.g. '#say param').
+syntax in the chat room, like hashtag (#) + command keyword (e.g. '#key param').
 If you need deeper access to chat functions an eventlistener might be the way to
 go. You can find eventlistener functions in the module youtube.py. The function
 'display_youtube_video_title()' reacts to the event 'channel_message' and does
 not have to be called with a hashtag (#). If you are curios: youtube.py searches
-for youtube links and prints out title and uploader if it found anything.  
+for youtube links and prints out title and uploader.  
 
 ## Write a command ##
 
@@ -68,10 +68,10 @@ in settings.py. First read the code:
 	
 	
 	add_command('hello', print_helloworld)
-Okay let us analyse the code: The first two lines are just standard python stuff
+Okay let's analyse the code: The first two lines are just standard python stuff
 (there is a shebang line, because it makes debugging easier). qllbot.Registry is
 very important, because it adds functions like add_command() or subscribe() to the
-module. In line 6 a python function named print_helloworld starts. It recieves
+module. In line 6 a python function named print_helloworld starts and it recieves
 one parameter. This parameter is everything that is followed by your command as a string.  
   
 Example: #hello world -> param = 'world', #hello -> param = ''.  
@@ -83,11 +83,11 @@ The next line returns an unicode string. Remember: Every string you return will
 be sent to the channel. If you don't return a string or you return an empty string,
 nothing will be sent.  
   
-The last line defines a command for your function. Here the function print_helloworld
-is mapped to the command 'hello'. Here is the command in action:  
+The last line sets a command key for your function. Here the function print_helloworld
+is mapped to the command key 'hello'. Here is the command in action:  
 	(02:38:22) qll_ext: #hello  
 	(02:38:22) testbot#2: hello world  
-It is allowed to map multiple command keywords to the same function (see #google or #g).  
+It is allowed to map multiple command keys to the same function (see #google or #g).  
 
 ## Troubleshooting ##
 
