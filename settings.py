@@ -22,7 +22,7 @@ COMMAND_TOKEN = '#'                    # marks a command (default: #)
 LOG_MESSAGE_FORMAT = '[%s %s] %s: %s'  # (channelname, time, username, message)
 LOG_EVENT_FORMAT   = '* [%s] %s'       # (time, message)
 
-CACHE         = 'cache'                # cache path
+CACHE         = 'cache'                # cache directory
 PUBKEY_PATH   = '%s/silc.pub' % CACHE  # public key file path
 PRIVKEY_PATH  = '%s/silc.prv' % CACHE  # private key file path
 DATABASE_PATH = '%s/db.sqlite' % CACHE # path to database (will be created if it does not exist)
@@ -39,10 +39,10 @@ USERCOMMANDS_TOKEN = '!'               # marks a usercommand
 # feeds
 NEWS_RESULTS = 3                       # maximum news results
 NEWS_FEEDS = {                         # allowed feeds with key (for #feed or #news command)
-	'faz':     'http://www.faz.net/s/Rub/Tpl~Epartner~SRss_~Ahomepageticker~E1.xml',
-	'zeit':    'http://newsfeed.zeit.de/index',
-	'spiegel': 'http://www.spiegel.de/index.rss',
-	'bbc':     'http://feeds.bbci.co.uk/news/rss.xml',
-	'aje':     'http://english.aljazeera.net/Services/Rss/?PostingId=2007731105943979989',
+	'faz':      'http://www.faz.net/s/Rub/Tpl~Epartner~SRss_~Ahomepageticker~E1.xml',
+	'zeit':     'http://newsfeed.zeit.de/index',
+	'spiegel':  'http://www.spiegel.de/index.rss',
+	'bbc':      'http://feeds.bbci.co.uk/news/rss.xml',
+	'aje':      'http://english.aljazeera.net/Services/Rss/?PostingId=2007731105943979989',
 	'guardian': 'http://feeds.guardian.co.uk/theguardian/rss'
 }
