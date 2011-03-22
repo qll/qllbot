@@ -7,7 +7,7 @@ PASSWORD = '1337password1337'          # password of the bot useraccount
 CHANNEL          = 'qllbottest'        # channel to connect to
 CHANNEL_PASSWORD = ''                  # channel password
 
-MODULES = (                            # loaded modules (can be foudn in ./modules)
+MODULES = (                            # loaded modules (can be found in ./modules)
 	'core',
 	'basic',
 	'internet',
@@ -22,9 +22,10 @@ COMMAND_TOKEN = '#'                    # marks a command (default: #)
 LOG_MESSAGE_FORMAT = '[%s %s] %s: %s'  # (channelname, time, username, message)
 LOG_EVENT_FORMAT   = '* [%s] %s'       # (time, message)
 
-PUBKEY_PATH   = 'cache/silc.pub'       # public key file path
-PRIVKEY_PATH  = 'cache/silc.prv'       # private key file path
-DATABASE_PATH = 'cache/db.sqlite'      # path to database (will be created if it does not exist)
+CACHE         = 'cache'                # cache path
+PUBKEY_PATH   = '%s/silc.pub' % CACHE  # public key file path
+PRIVKEY_PATH  = '%s/silc.prv' % CACHE  # private key file path
+DATABASE_PATH = '%s/db.sqlite' % CACHE # path to database (will be created if it does not exist)
 
 VERSION  = '0.3.1'
 GREETING = 'qllbot v%s' % VERSION      # message sent when bot joins channel

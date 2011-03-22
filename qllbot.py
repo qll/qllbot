@@ -47,6 +47,8 @@ class QllBot(QllSilcClient):
 
 
 if __name__ == '__main__':
+	if not os.path.isdir(CACHE):
+		os.mkdir(CACHE, 0750)
 	if not os.path.isfile(PUBKEY_PATH) or not os.path.isfile(PRIVKEY_PATH):
 		keys = silc.create_key_pair(PUBKEY_PATH, PRIVKEY_PATH, passphrase = PASSWORD)
 	else:
