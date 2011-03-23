@@ -19,7 +19,7 @@ class QllBot(QllSilcClient):
 		eventsys.call('private_message', {'sender': sender, 'channel': '@PM', 'flags': flags, 'message': message})
 
 	def running(self):
-		client.connect_to_server('silcnet.org')
+		self.connect_to_server(SERVER)
 		self.logEvent('Running')
 
 	def connected(self):
@@ -28,6 +28,8 @@ class QllBot(QllSilcClient):
 
 	def disconnected(self, msg):
 		self.logEvent('Disconnected: %s' % msg)
+		self.logEvent('Attempting reconnect')
+		self.connect_to_server(SERVER)
 
 	def command_reply_join(self, channel, name, topic, hmac, x, y, users):
 		eventsys.call('command_reply_join', {'channel': channel, 'name': name, 'topic': topic, 'hmac': hmac, 'x': x, 'y': y, 'users': users})

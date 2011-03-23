@@ -4,6 +4,7 @@
 USERNAME = 'testbot'                   # useraccount of the bot
 PASSWORD = '1337password1337'          # password of the bot useraccount
 
+SERVER           = 'silcnet.org'       # SILC server
 CHANNEL          = 'qllbottest'        # channel to connect to
 CHANNEL_PASSWORD = ''                  # channel password
 
