@@ -9,8 +9,8 @@ dependancy) to work correctly. Currently it just supports Python 2.6/2.7.
 Check the [**qllbot wiki**](https://github.com/qll/qllbot/wiki) if you have any
 questions or want to learn how to develop modules.  
   
-Join the channel 'qllbotsupport' with password 'helpme' for any support concerning
-qllbot.
+Join the channel 'qllbotsupport' with password 'helpme' on 'silcnet.org' for any support.
+If I'm not present there feel free to email me.
 
 ## Installation ##
 

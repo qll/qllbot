@@ -39,31 +39,31 @@ class QllBot(QllSilcClient):
 			self.logMessage(USERNAME, GREETING, channel)
 
 	def notify_join(self, user, channel):
-		eventsys.call('notify_join', {'channel': channel, 'user': user})
+		eventsys.call('join', {'channel': channel, 'user': user})
 	
 	def notify_leave(self, user, channel):
-		eventsys.call('notify_leave', {'channel': channel, 'user': user})
+		eventsys.call('leave', {'channel': channel, 'user': user})
 	
 	def notify_signoff(self, user, message):
-		eventsys.call('notify_signoff', {'user': user, 'message': message})
+		eventsys.call('signoff', {'user': user, 'message': message})
 	
 	def notify_topic_set(self, ptype, user, channel, topic):
-		eventsys.call('notify_topic_set', {'type': ptype, 'user': user, 'channel': channel, 'topic': topic})
+		eventsys.call('topic_set', {'type': ptype, 'user': user, 'channel': channel, 'topic': topic})
 	
 	def notify_invite(self, channel, channel_name, user):
-		eventsys.call('notify_invite', {'channel': channel, 'channel_name': channel_name, 'user': user})
+		eventsys.call('invite', {'channel': channel, 'channel_name': channel_name, 'user': user})
 	
 	def notify_nick_change(self, old_user, new_user):
-		eventsys.call('notify_nick_change', {'old_user': old_user, 'new_user': new_user})
+		eventsys.call('nick_change', {'old_user': old_user, 'new_user': new_user})
 	
 	def notify_kicked(self, kicked, message, kicker, channel):
-		eventsys.call('notify_kicked', {'kicked': kicked, 'message': message, 'kicker': kicker, 'channel': channel})
+		eventsys.call('kicked', {'kicked': kicked, 'message': message, 'kicker': kicker, 'channel': channel})
 	
 	def notify_motd(self, message):
-		eventsys.call('notify_motd', {'message': message})
+		eventsys.call('motd', {'message': message})
 	
 	def notify_server_signoff(self):
-		eventsys.call('notify_server_signoff', {})
+		eventsys.call('server_signoff', {})
 	
 	def keep_alive(self):
 		''' Keeps client alive. If nothing gets sent to the server for about 1 minute, pysilc looses connection. '''
