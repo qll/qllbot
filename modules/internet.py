@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 import urllib2
 import re
-from xml.dom import minidom
-from qllbot.Registry import *
+from xml.etree.ElementTree import ElementTree
 from qllbot.basic_functions import strip_tags
+from qllbot.Registry import *
 from settings import *
 
 
@@ -34,29 +34,37 @@ def google(param):
 	return output[:-1]
 
 def get_weather(param):
-	''' Get weather details for Bochum. Other location can be checked too: #weather [location] (e.g. #weather Berlin) '''
-	location = 'Bochum'
+	''' Get weather details for your city. Other location can be checked too: #weather [location] (e.g. #weather Berlin) '''
+	location = WEATHER_LOCATION
 	if param != '':
-		if not re.match('^[\w ]+$', param):
+		if not re.match('^[\w\d ]+$', param):
 			return 'Invalid location. Use city name or postal code.'
 		location = param
 	try:
 		handle = urllib2.urlopen('http://www.google.com/ig/api?weather=%s' % urllib2.quote(location))
 	except:
 		return 'Error opening URL.'
-	dom = minidom.parse(handle)
+	tree = ElementTree()
+	tree.parse(handle)
 	handle.close()
 	
-	weather = u'Did not find city.'
-	for node in dom.getElementsByTagName('current_conditions'):
-		weather = u'Currently: %s at %s°C in %s\n' % (
-			node.childNodes[0].getAttribute('data'),
-			node.childNodes[2].getAttribute('data'),
-			location
-		)
-	for node in dom.getElementsByTagName('forecast_conditions'):
-		minTemp = node.childNodes[1].getAttribute('data')
-		maxTemp = node.childNodes[2].getAttribute('data')
+	city = tree.find('weather/forecast_information/city')
+	if city == None:
+		return 'Did not find city.'
+	city = city.attrib['data']
+	
+	condition = tree.find('weather/current_conditions/condition').attrib['data']
+	curtemp   = tree.find('weather/current_conditions/temp_c').attrib['data']
+	
+	weather = u'Currently: %s at %s°C in %s\n' % (condition, curtemp, city)
+	
+	for condition in tree.getiterator('forecast_conditions'):
+		minTemp = condition.find('low').attrib['data']
+		maxTemp = condition.find('high').attrib['data']
+		day     = condition.find('day_of_week').attrib['data']
+		cond    = condition.find('condition').attrib['data']
+		if cond == '':
+			cond = 'Unknown condition'
 		unit    = u'F'
 		if WEATHER_IN_CELSIUS:
 			# convert fahrenheit to celsius
@@ -64,11 +72,7 @@ def get_weather(param):
 			maxTemp = (float(maxTemp) - 32.0) * (5.0/9)
 			unit    = u'°C'
 		weather += u'%s: %s at %d-%d%s\n' % (
-			node.childNodes[0].getAttribute('data'),
-			node.childNodes[4].getAttribute('data'),
-			round(minTemp),
-			round(maxTemp),
-			unit
+			day, cond, round(minTemp), round(maxTemp), unit
 		)
 	
 	return weather[:-1].encode('utf-8')

@@ -33,6 +33,7 @@ GREETING = 'qllbot v%s' % VERSION      # message sent when bot joins channel
 
 ### MODULES ###
 # internet
+WEATHER_LOCATION   = 'Bochum'          # default weather location (if #weather gets no parameters)
 WEATHER_IN_CELSIUS = True              # converts #weather results in °C
 GOOGLE_MAX_RESULTS = 3                 # displayed google results
 # usercommands
