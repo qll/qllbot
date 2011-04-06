@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+PROTOCOL = 'SILC'                      # SILC or IRC
+
 USERNAME = 'testbot'                   # useraccount of the bot
 PASSWORD = '1337password1337'          # password of the bot useraccount
 
