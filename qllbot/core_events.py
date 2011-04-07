@@ -15,15 +15,15 @@ def interpret_message(param):
 
 def log_message(param):
 	''' Logs all messages in channels the bot joined and per private message to console. '''
-	registry.client.logMessage(param['sender'], param['message'], param['channel'])
+	registry.client.log_message(param['sender'], param['message'], param['channel'])
 
 def log_join_channel(param):
 	''' Prints a text to console when a user joins a channel the bot resides in. '''
-	registry.client.logEvent('User named %s joined channel %s' % (param['user'].username, param['channel'].channel_name))
+	registry.client.log_event('User named %s joined channel %s' % (param['user'].username, param['channel'].channel_name))
 
 def log_leave_channel(param):
 	''' Prints a text to console when a user leaves a channel the bot resides in. '''
-	registry.client.logEvent('User named %s left channel %s' % (param['user'].username, param['channel'].channel_name))
+	registry.client.log_event('User named %s left channel %s' % (param['user'].username, param['channel'].channel_name))
 
 
 subscribe('channel_message', log_message)

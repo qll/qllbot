@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-PROTOCOL = 'SILC'                      # SILC or IRC
+PROTOCOL = 'IRC'                       # SILC or IRC
 
-USERNAME = 'testbot'                   # useraccount of the bot
+USERNAME = 'qllguy'                    # useraccount of the bot
 PASSWORD = '1337password1337'          # password of the bot useraccount
 
-SERVER           = 'silcnet.org'       # SILC server
-CHANNEL          = 'qllbottest'        # channel to connect to
+SERVER           = 'irc.freenode.net'  # Server address
+PORT             = ''                  # leave blank if you don't know (just for IRC)
+CHANNEL          = '#qllbottest'       # channel to connect to
 CHANNEL_PASSWORD = ''                  # channel password
 
 MODULES = (                            # loaded modules (can be found in ./modules)
@@ -26,11 +27,11 @@ LOG_MESSAGE_FORMAT = '[%s %s] %s: %s'  # (channelname, time, username, message)
 LOG_EVENT_FORMAT   = '* [%s] %s'       # (time, message)
 
 CACHE         = 'cache'                # cache directory
-PUBKEY_PATH   = '%s/silc.pub' % CACHE  # public key file path
-PRIVKEY_PATH  = '%s/silc.prv' % CACHE  # private key file path
+PUBKEY_PATH   = '%s/silc.pub' % CACHE  # public key file path (for SILC)
+PRIVKEY_PATH  = '%s/silc.prv' % CACHE  # private key file path (for SILC)
 DATABASE_PATH = '%s/db.sqlite' % CACHE # path to database (will be created if it does not exist)
 
-VERSION  = '0.3.1'
+VERSION  = '0.4'
 GREETING = 'qllbot v%s' % VERSION      # message sent when bot joins channel
 
 ### MODULES ###

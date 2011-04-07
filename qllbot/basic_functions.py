@@ -16,7 +16,7 @@ def strip_tags(string):
 def send_message(channel, message):
 	''' Sends a message to a channel. '''
 	registry.client.send_channel_message(channel, message.decode('utf-8'))
-	registry.client.logMessage(USERNAME, message, channel)
+	registry.client.log_message(USERNAME, message, channel)
 
 def shorten_url(url):
 	''' Shortens an URL. Currently uses tinyurl.com. '''

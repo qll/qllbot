@@ -9,6 +9,7 @@ from qllbot.Registry import Registry
 from qllbot.Events import Events
 from qllbot.Interpreter import Interpreter
 from qllbot.QllSilcClient import QllSilcClient
+from qllbot.QllIrcClient import QllIrcClient
 from settings import *
 
 if __name__ == '__main__':
@@ -41,8 +42,7 @@ if __name__ == '__main__':
 			keys = silc.load_key_pair(PUBKEY_PATH, PRIVKEY_PATH, passphrase = PASSWORD)
 		client = QllSilcClient(keys, USERNAME, USERNAME, USERNAME)
 	elif PROTOCOL == 'IRC':
-		print 'Not implemented, yet.'
-		sys.exit()
+		client = QllIrcClient()
 	else:
 		print 'Unknown protocol (SILC or IRC possible).'
 		sys.exit(1)
