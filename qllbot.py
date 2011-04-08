@@ -56,11 +56,13 @@ if __name__ == '__main__':
 	if create_tables:
 		eventsys.call('create_tables', {})
 		eventsys.call('insert_into_created_tables', {})
-
-	timer = 0
-
-	while True:
-		try:
+	
+	try:
+		# IRC client has it's own loop inside the class
+		client.run()
+	
+		timer = 0
+		while True:
 			client.run_one()
 			time.sleep(0.2)
 			timer += 1
@@ -68,8 +70,9 @@ if __name__ == '__main__':
 			if timer >= 100:
 				timer = 0
 				client.keep_alive()
-		except KeyboardInterrupt:
-			break
-	
-	connection.commit()
-	connection.close()
+	except KeyboardInterrupt:
+		sys.exit()
+	finally:
+		connection.commit()
+		connection.close()
+

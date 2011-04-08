@@ -33,9 +33,12 @@ class QllClient():
 		self.log_event('Running (%s-Mode)' % PROTOCOL)
 		self.connect_to_server(SERVER)
 
-	def connected(self):
+	def connected_to_server(self):
 		self.log_event('Connected to %s' % SERVER)
 		self.command_call('JOIN %s %s' % (CHANNEL, CHANNEL_PASSWORD))
+
+	def connected(self):
+		self.connected_to_server()
 
 	def disconnected(self, msg):
 		self.log_event('Disconnected: %s' % msg)

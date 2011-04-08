@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import socket
+import sys, socket, asynchat, asyncore
 from settings import *
 from qllbot.Registry import *
 from qllbot.QllClient import QllClient
@@ -9,14 +9,66 @@ from qllbot.IrcUser import IrcUser
 
 registry = Registry()
 
-# todo: implement with asyncore.asynchat
-class QllIrcClient(QllClient):
 
-	irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+class QllIrcClient(QllClient, asynchat.async_chat):
 	def __init__(self):
+		asynchat.async_chat.__init__(self)
+		self.set_terminator('\n')
+		self.buffer = ''
+	
+	def run(self):
 		self.running()
 	
+	def collect_incoming_data(self, data):
+		self.buffer += data
+	
+	def found_terminator(self):
+		print self.buffer
+		response = self.buffer.strip().split(' ', 3)
+		if len(response) > 2:
+			if response[1] == 'JOIN':
+				self.notify_join(self.parse_user(response[0]), response[2][1:])
+			elif response[1] == 'PRIVMSG':
+				if response[2] == USERNAME:
+					self.private_message(self.parse_user(response[0]), None, response[3][1:])
+				else:
+					self.channel_message(self.parse_user(response[0]), response[2], None, response[3][1:])
+		elif len(response) > 1:
+			if response[0] == 'PING':
+				self.command_call('PONG %s' % response[1])
+		
+		self.buffer = ''
+
+	def run_one(self):
+		''' Don't need this, because loop is asynchronous '''
+		pass
+
+	def command_call(self, command):
+		self.send('%s\n' % command)
+	
+	def connect_to_server(self, server, port = 6667):
+		if PORT != '':
+			port = PORT
+		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.connect((server, port))
+		
+		asyncore.loop()
+	
+	def handle_connect(self):
+		''' Identifies the user to the server '''
+		self.command_call('NICK %s' % USERNAME)
+		self.command_call('USER %s %d %d :%s' % (USERNAME, 0, 0, USERNAME))
+		self.connected_to_server()
+	
+	def handle_close(self):
+		''' Starts the disconnected() event '''
+		self.disconnected('')
+	
+	def send_channel_message(self, channel, message):
+		''' Sends a message to a channel '''
+		for line in message.encode('utf-8').split('\n'):
+			self.command_call('PRIVMSG %s :%s' % (channel, line))
+			
 	def parse_user(self, string):
 		''' Tries to emulate something like the SilcUser object '''
 		# cut ':'
@@ -29,36 +81,4 @@ class QllIrcClient(QllClient):
 		user.realname = username[1]
 		user.hostname = string[1]
 		return user
-
-	def run_one(self):
-		response = self.irc.recv(500)
-		#print response
-		response = response.strip().split(' ', 3)
-		if len(response) > 2:
-			if response[1] == 'JOIN':
-				self.notify_join(self.parse_user(response[0]), response[2][1:])
-			elif response[1] == 'PRIVMSG':
-				if response[2] == USERNAME:
-					self.private_message(self.parse_user(response[0]), None, response[3][1:])
-				else:
-					self.channel_message(self.parse_user(response[0]), response[2], None, response[3][1:])
-		elif len(response) > 1:
-			if response[0] == 'PING':
-				self.command_call('PONG %s' % response[1])
-
-	def command_call(self, command):
-		self.irc.send('%s\n' % command)
-
-	def connect_to_server(self, server):
-		defaultPort = 6667
-		if PORT != '':
-			defaultPort = PORT
-		self.irc.connect((server, defaultPort))
-		self.command_call('NICK %s' % USERNAME)
-		self.command_call('USER %s %d %d :%s' % (USERNAME, 0, 0, USERNAME))
-		self.connected()
-	
-	def send_channel_message(self, channel, message):
-		for line in message.encode('utf-8').split('\n'):
-			self.command_call('PRIVMSG %s :%s' % (channel, line))
 
