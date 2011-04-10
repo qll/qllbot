@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
-import sys
-import time
-import sqlite3
-import silc
+import os, sys, time, sqlite3
 from qllbot.Registry import Registry
 from qllbot.Events import Events
 from qllbot.Interpreter import Interpreter
@@ -36,11 +32,12 @@ if __name__ == '__main__':
 
 	# get client
 	if PROTOCOL == 'SILC':
+		import silc
 		if not os.path.isfile(PUBKEY_PATH) or not os.path.isfile(PRIVKEY_PATH):
 			keys = silc.create_key_pair(PUBKEY_PATH, PRIVKEY_PATH, passphrase = PASSWORD)
 		else:
 			keys = silc.load_key_pair(PUBKEY_PATH, PRIVKEY_PATH, passphrase = PASSWORD)
-		client = QllSilcClient(keys, USERNAME, USERNAME, USERNAME)
+		client = QllSilcClient(keys, USERNAME, USERNAME, REALNAME)
 	elif PROTOCOL == 'IRC':
 		client = QllIrcClient()
 	else:
@@ -58,9 +55,10 @@ if __name__ == '__main__':
 		eventsys.call('insert_into_created_tables', {})
 	
 	try:
-		# IRC client has it's own loop inside the class
+		# IRC client has it's own loop inside its class
 		client.run()
 	
+		# SILC client
 		timer = 0
 		while True:
 			client.run_one()

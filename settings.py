@@ -4,7 +4,9 @@
 PROTOCOL = 'IRC'                       # SILC or IRC
 
 USERNAME = 'qllguy'                    # useraccount of the bot
+REALNAME = 'qllguy'                    # real name of the bot
 PASSWORD = '1337password1337'          # password of the bot useraccount
+OWNER    = 'qll'                       # username of the bot admin
 
 SERVER           = 'irc.freenode.net'  # Server address
 PORT             = ''                  # leave blank if you don't know (just for IRC)
@@ -31,7 +33,7 @@ PUBKEY_PATH   = '%s/silc.pub' % CACHE  # public key file path (for SILC)
 PRIVKEY_PATH  = '%s/silc.prv' % CACHE  # private key file path (for SILC)
 DATABASE_PATH = '%s/db.sqlite' % CACHE # path to database (will be created if it does not exist)
 
-VERSION  = '0.4'
+VERSION  = '0.4.1'
 GREETING = 'qllbot v%s' % VERSION      # message sent when bot joins channel
 
 ### MODULES ###

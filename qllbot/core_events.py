@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from basic_functions import send_message
+from settings import *
 from Registry import *
 
 
@@ -17,17 +18,22 @@ def log_message(param):
 	''' Logs all messages in channels the bot joined and per private message to console. '''
 	registry.client.log_message(param['sender'], param['message'], param['channel'])
 
+def welcome(param):
+	if GREETING != '':
+		send_message(param['channel'], GREETING)
+
 def log_join_channel(param):
 	''' Prints a text to console when a user joins a channel the bot resides in. '''
-	registry.client.log_event('User named %s joined channel %s' % (param['user'].username, param['channel'].channel_name))
+	registry.client.log_event('User named %s joined channel %s' % (param['user'].username, param['channel']))
 
 def log_leave_channel(param):
 	''' Prints a text to console when a user leaves a channel the bot resides in. '''
-	registry.client.log_event('User named %s left channel %s' % (param['user'].username, param['channel'].channel_name))
+	registry.client.log_event('User named %s left channel %s' % (param['user'].username, param['channel']))
 
 
 subscribe('channel_message', log_message)
 subscribe('private_message', log_message)
 subscribe('channel_message', interpret_message)
-subscribe('notify_join', log_join_channel)
-subscribe('notify_leave', log_leave_channel)
+subscribe('join', log_join_channel)
+subscribe('leave', log_leave_channel)
+subscribe('join', welcome)

@@ -35,6 +35,7 @@ class QllClient():
 
 	def connected_to_server(self):
 		self.log_event('Connected to %s' % SERVER)
+		self.log_event('Using %s as nickname' % USERNAME)
 		self.command_call('JOIN %s %s' % (CHANNEL, CHANNEL_PASSWORD))
 
 	def connected(self):

@@ -2,12 +2,8 @@
 # -*- coding: utf-8 -*-
 import sys, socket, asynchat, asyncore
 from settings import *
-from qllbot.Registry import *
 from qllbot.QllClient import QllClient
 from qllbot.IrcUser import IrcUser
-
-
-registry = Registry()
 
 
 class QllIrcClient(QllClient, asynchat.async_chat):
@@ -23,7 +19,6 @@ class QllIrcClient(QllClient, asynchat.async_chat):
 		self.buffer += data
 	
 	def found_terminator(self):
-		print self.buffer
 		response = self.buffer.strip().split(' ', 3)
 		if len(response) > 2:
 			if response[1] == 'JOIN':
@@ -33,6 +28,11 @@ class QllIrcClient(QllClient, asynchat.async_chat):
 					self.private_message(self.parse_user(response[0]), None, response[3][1:])
 				else:
 					self.channel_message(self.parse_user(response[0]), response[2], None, response[3][1:])
+			elif response[1] == 'NOTICE':
+				pass
+			else:
+				# debugstuff
+				print 'Unknown command:\n %s\n' % (self.buffer)
 		elif len(response) > 1:
 			if response[0] == 'PING':
 				self.command_call('PONG %s' % response[1])
@@ -57,12 +57,12 @@ class QllIrcClient(QllClient, asynchat.async_chat):
 	def handle_connect(self):
 		''' Identifies the user to the server '''
 		self.command_call('NICK %s' % USERNAME)
-		self.command_call('USER %s %d %d :%s' % (USERNAME, 0, 0, USERNAME))
+		self.command_call('USER %s %d %d :%s' % (USERNAME, 0, 0, REALNAME))
 		self.connected_to_server()
 	
 	def handle_close(self):
 		''' Starts the disconnected() event '''
-		self.disconnected('')
+		#self.disconnected('')
 	
 	def send_channel_message(self, channel, message):
 		''' Sends a message to a channel '''
