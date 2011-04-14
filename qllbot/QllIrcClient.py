@@ -14,9 +14,6 @@ class QllIrcClient(QllClient):
 	def run(self):
 		self.running()
 	
-	def collect_incoming_data(self, data):
-		self.buffer += data
-	
 	def found_terminator(self, response):
 		response = response.strip().split(' ', 3)
 		if len(response) > 2:
@@ -36,7 +33,7 @@ class QllIrcClient(QllClient):
 	def run_one(self):
 		try:
 			self.buffer += self.irc.recv(512)
-		except:
+		except socket.error:
 			pass
 		if self.buffer != '':
 			strings = self.buffer.split('\n')
@@ -56,10 +53,6 @@ class QllIrcClient(QllClient):
 		self.command_call('USER %s %d %d :%s' % (USERNAME, 0, 0, REALNAME))
 		self.connected_to_server()
 
-	def disconnect(self):
-		''' Starts the disconnected() event '''
-		self.disconnected('')
-	
 	def send_channel_message(self, channel, message):
 		''' Sends a message to a channel '''
 		for line in message.encode('utf-8').split('\n'):

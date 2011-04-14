@@ -41,7 +41,7 @@ if __name__ == '__main__':
 	elif PROTOCOL == 'IRC':
 		client = QllIrcClient()
 	else:
-		print 'Unknown protocol (SILC or IRC possible).'
+		print('Unknown protocol (SILC or IRC possible).')
 		sys.exit(1)
 	registry.client = client
 

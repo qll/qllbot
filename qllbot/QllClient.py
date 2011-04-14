@@ -15,10 +15,10 @@ class QllClient():
 			username = user
 		else:
 			username = user.username
-		print LOG_MESSAGE_FORMAT % (channel, self.get_current_time(), username, message)
+		print(LOG_MESSAGE_FORMAT % (channel, self.get_current_time(), username, message))
 
 	def log_event(self, message):
-		print LOG_EVENT_FORMAT % (self.get_current_time(), message)
+		print(LOG_EVENT_FORMAT % (self.get_current_time(), message))
 
 	def get_current_time(self):
 		return time.strftime("%H:%M:%S", time.localtime())
@@ -36,7 +36,8 @@ class QllClient():
 	def connected_to_server(self):
 		self.log_event('Connected to %s' % SERVER)
 		self.log_event('Using %s as nickname' % USERNAME)
-		self.command_call('JOIN %s %s' % (CHANNEL, CHANNEL_PASSWORD))
+		for channel, password in CHANNELS.iteritems():
+			self.command_call('JOIN %s %s' % (channel, password)) 
 
 	def connected(self):
 		self.connected_to_server()

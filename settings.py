@@ -10,10 +10,12 @@ OWNER    = 'qll'                       # username of the bot admin
 
 SERVER           = 'irc.freenode.net'  # Server address
 PORT             = ''                  # leave blank if you don't know (just for IRC)
-CHANNEL          = '#qllbottest'       # channel to connect to
+CHANNELS         = {                   # channels to connect to {'NAME': 'PASSWORD', ...}
+	'#qllbottest': '',
+}
 CHANNEL_PASSWORD = ''                  # channel password
 
-SEND_KEEP_ALIVE  = True                # Default: False. Some network configurations
+SEND_KEEP_ALIVE  = False               # Default: False. Some network configurations
                                        # require the bot to send data every 20 seconds.
                                        # Use this, if you get "silent" disconnects.
 
