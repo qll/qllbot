@@ -24,6 +24,8 @@ class QllIrcClient(QllClient):
 					self.private_message(self.parse_user(response[0]), None, response[3][1:])
 				else:
 					self.channel_message(self.parse_user(response[0]), response[2], None, response[3][1:])
+			elif response[1] == 'INVITE':
+				self.notify_invite(response[3][1:], response[3][1:], self.parse_user(response[0]))
 		elif len(response) > 1:
 			if response[0] == 'PING':
 				self.command_call('PONG %s' % response[1])

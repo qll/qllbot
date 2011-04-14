@@ -13,7 +13,6 @@ PORT             = ''                  # leave blank if you don't know (just for
 CHANNELS         = {                   # channels to connect to {'NAME': 'PASSWORD', ...}
 	'#qllbottest': '',
 }
-CHANNEL_PASSWORD = ''                  # channel password
 
 SEND_KEEP_ALIVE  = False               # Default: False. Some network configurations
                                        # require the bot to send data every 20 seconds.
@@ -39,7 +38,7 @@ PUBKEY_PATH   = '%s/silc.pub' % CACHE  # public key file path (for SILC)
 PRIVKEY_PATH  = '%s/silc.prv' % CACHE  # private key file path (for SILC)
 DATABASE_PATH = '%s/db.sqlite' % CACHE # path to database (will be created if it does not exist)
 
-VERSION  = '0.4.1'
+VERSION  = '0.4.2'
 GREETING = 'qllbot v%s' % VERSION      # message sent when bot joins channel
 
 ### MODULES ###

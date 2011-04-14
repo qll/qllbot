@@ -30,6 +30,11 @@ def log_leave_channel(param):
 	''' Prints a text to console when a user leaves a channel the bot resides in. '''
 	registry.client.log_event('User named %s left channel %s' % (param['user'].username, param['channel']))
 
+def join_invited_channel(param):
+	''' Joins a channel the bot gets invited to (by his owner) '''
+	if param['user'].username == OWNER:
+		registry.client.command_call('JOIN %s' % param['channel_name'])	
+
 
 subscribe('channel_message', log_message)
 subscribe('private_message', log_message)
@@ -37,3 +42,4 @@ subscribe('channel_message', interpret_message)
 subscribe('join', log_join_channel)
 subscribe('leave', log_leave_channel)
 subscribe('join', welcome)
+subscribe('invite', join_invited_channel)
