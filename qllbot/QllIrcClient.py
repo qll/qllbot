@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import sys, socket, asynchat, asyncore
+import sys, socket
 from settings import *
 from qllbot.QllClient import QllClient
 from qllbot.IrcUser import IrcUser
 
 
-class QllIrcClient(QllClient, asynchat.async_chat):
+class QllIrcClient(QllClient):
 	def __init__(self):
-		asynchat.async_chat.__init__(self)
-		self.set_terminator('\n')
 		self.buffer = ''
+		self.irc    = None
 	
 	def run(self):
 		self.running()
@@ -18,8 +17,8 @@ class QllIrcClient(QllClient, asynchat.async_chat):
 	def collect_incoming_data(self, data):
 		self.buffer += data
 	
-	def found_terminator(self):
-		response = self.buffer.strip().split(' ', 3)
+	def found_terminator(self, response):
+		response = response.strip().split(' ', 3)
 		if len(response) > 2:
 			if response[1] == 'JOIN':
 				self.notify_join(self.parse_user(response[0]), response[2][1:])
@@ -28,11 +27,6 @@ class QllIrcClient(QllClient, asynchat.async_chat):
 					self.private_message(self.parse_user(response[0]), None, response[3][1:])
 				else:
 					self.channel_message(self.parse_user(response[0]), response[2], None, response[3][1:])
-			elif response[1] == 'NOTICE':
-				pass
-			else:
-				# debugstuff
-				print 'Unknown command:\n %s\n' % (self.buffer)
 		elif len(response) > 1:
 			if response[0] == 'PING':
 				self.command_call('PONG %s' % response[1])
@@ -40,29 +34,31 @@ class QllIrcClient(QllClient, asynchat.async_chat):
 		self.buffer = ''
 
 	def run_one(self):
-		''' Don't need this, because loop is asynchronous '''
-		pass
+		try:
+			self.buffer += self.irc.recv(512)
+		except:
+			pass
+		if self.buffer != '':
+			strings = self.buffer.split('\n')
+			for string in strings:
+				self.found_terminator(string)
 
 	def command_call(self, command):
-		self.send('%s\n' % command)
+		self.irc.send('%s\n' % command)
 	
 	def connect_to_server(self, server, port = 6667):
 		if PORT != '':
 			port = PORT
-		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.connect((server, port))
-		
-		asyncore.loop()
-	
-	def handle_connect(self):
-		''' Identifies the user to the server '''
+		self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.irc.connect((server, port))
+		self.irc.setblocking(0)
 		self.command_call('NICK %s' % USERNAME)
 		self.command_call('USER %s %d %d :%s' % (USERNAME, 0, 0, REALNAME))
 		self.connected_to_server()
-	
-	def handle_close(self):
+
+	def disconnect(self):
 		''' Starts the disconnected() event '''
-		#self.disconnected('')
+		self.disconnected('')
 	
 	def send_channel_message(self, channel, message):
 		''' Sends a message to a channel '''
