@@ -19,7 +19,7 @@ def log_message(param):
 	registry.client.log_message(param['sender'], param['message'], param['channel'])
 
 def welcome(param):
-	if GREETING != '':
+	if param['user'].username == USERNAME and GREETING != '':
 		send_message(param['channel'], GREETING)
 
 def log_join_channel(param):

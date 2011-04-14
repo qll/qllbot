@@ -4,7 +4,6 @@ import os, sys, time, sqlite3
 from qllbot.Registry import Registry
 from qllbot.Events import Events
 from qllbot.Interpreter import Interpreter
-from qllbot.QllSilcClient import QllSilcClient
 from qllbot.QllIrcClient import QllIrcClient
 from settings import *
 
@@ -33,6 +32,7 @@ if __name__ == '__main__':
 	# get client
 	if PROTOCOL == 'SILC':
 		import silc
+		from qllbot.QllSilcClient import QllSilcClient
 		if not os.path.isfile(PUBKEY_PATH) or not os.path.isfile(PRIVKEY_PATH):
 			keys = silc.create_key_pair(PUBKEY_PATH, PRIVKEY_PATH, passphrase = PASSWORD)
 		else:
@@ -63,11 +63,13 @@ if __name__ == '__main__':
 		while True:
 			client.run_one()
 			time.sleep(0.2)
-			timer += 1
-			# 20 seconds
-			if timer >= 100:
-				timer = 0
-				client.keep_alive()
+			
+			if SEND_KEEP_ALIVE:
+				timer += 1
+				# 20 seconds
+				if timer >= 100:
+					timer = 0
+					client.keep_alive()
 	except KeyboardInterrupt:
 		sys.exit()
 	finally:

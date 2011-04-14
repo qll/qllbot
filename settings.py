@@ -13,6 +13,10 @@ PORT             = ''                  # leave blank if you don't know (just for
 CHANNEL          = '#qllbottest'       # channel to connect to
 CHANNEL_PASSWORD = ''                  # channel password
 
+SEND_KEEP_ALIVE  = True                # Default: False. Some network configurations
+                                       # require the bot to send data every 20 seconds.
+                                       # Use this, if you get "silent" disconnects.
+
 MODULES = (                            # loaded modules (can be found in ./modules)
 	'core',
 	'basic',
