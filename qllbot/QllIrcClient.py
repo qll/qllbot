@@ -12,9 +12,11 @@ class QllIrcClient(QllClient):
 		self.irc    = None
 	
 	def run(self):
+		''' Starts the client '''
 		self.running()
 	
 	def found_terminator(self, response):
+		''' Interprets raw IRC commands '''
 		response = response.strip().split(' ', 3)
 		if len(response) > 2:
 			if response[1] == 'JOIN':
@@ -33,19 +35,22 @@ class QllIrcClient(QllClient):
 		self.buffer = ''
 
 	def run_one(self):
+		''' Checks if the socket recieved some data '''
 		try:
 			self.buffer += self.irc.recv(512)
 		except socket.error:
 			pass
 		if self.buffer != '':
-			strings = self.buffer.split('\n')
+			strings = self.buffer.split('\r\n')
 			for string in strings:
 				self.found_terminator(string)
 
 	def command_call(self, command):
-		self.irc.send('%s\n' % command)
+		''' Sends an IRC command '''
+		self.irc.send('%s\r\n' % command)
 	
 	def connect_to_server(self, server, port = 6667):
+		''' Connects to a IRC Server '''
 		if PORT != '':
 			port = PORT
 		self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -58,6 +63,10 @@ class QllIrcClient(QllClient):
 	def send_channel_message(self, channel, message):
 		''' Sends a message to a channel '''
 		for line in message.encode('utf-8').split('\n'):
+			# max message length of IRC = 512 (with \r\n)
+			if len(line) > 510:
+				self.command_call('PRIVMSG %s :%s' % (channel, line[:510]))
+				self.send_channel_message(line[511:])
 			self.command_call('PRIVMSG %s :%s' % (channel, line))
 			
 	def parse_user(self, string):

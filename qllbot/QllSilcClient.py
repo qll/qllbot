@@ -12,4 +12,5 @@ class QllSilcClient(QllClient, silc.SilcClient):
 		self.realname = realname
 	
 	def run(self):
+		''' Starts the client '''
 		silc.SilcClient.__init__(self, self.keys, self.username, self.user, self.realname)

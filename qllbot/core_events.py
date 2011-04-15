@@ -41,5 +41,7 @@ subscribe('private_message', log_message)
 subscribe('channel_message', interpret_message)
 subscribe('join', log_join_channel)
 subscribe('leave', log_leave_channel)
-subscribe('join', welcome)
 subscribe('invite', join_invited_channel)
+
+if GREETING != '':
+	subscribe('join', welcome)
