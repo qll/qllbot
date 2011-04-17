@@ -97,7 +97,7 @@ def seen(param):
 				ftime = 'was seen %d minutes ago' % (minutes)
 		else:
 			ftime  = time.strftime('%H:%M on %d.%m.%Y', time.localtime(row[0]))
-		result = '%s %s in %s.' % (param, ftime, row[1])
+		result = '%s %s (%s).' % (param, ftime, row[1])
 	return result
 	
 
