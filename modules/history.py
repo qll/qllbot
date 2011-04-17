@@ -79,10 +79,10 @@ def seen(param):
 	if param in registry.history_seen:
 		return 'User currently online (%s).' % (', '.join(registry.history_seen[param]))
 	
-	result = 'I have never seen this nickname.'
 	c = registry.db.cursor()
 	c.execute('SELECT time, channel FROM seen WHERE user = ?', (param,))
-	for row in c:
+	row = c.fetchone()
+	if row != None:
 		diff = time.time() - row[0]
 		if diff <= 3600:
 			minutes = round(diff / 60)
@@ -94,8 +94,9 @@ def seen(param):
 				ftime = '%d minutes ago' % (minutes)
 		else:
 			ftime  = time.strftime('%H:%M on %d.%m.%Y', time.localtime(row[0]))
-		result = 'I have seen %s %s in %s.' % (param, ftime, row[1])
-	return result
+		return 'I have seen %s %s in %s.' % (param, ftime, row[1])
+	else:
+		return 'I have never seen this nickname.'
 	
 
 subscribe('create_tables', create_seen_tables)
