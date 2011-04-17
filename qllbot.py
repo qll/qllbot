@@ -68,6 +68,7 @@ try:
 				timer = 0
 				client.keep_alive()
 except KeyboardInterrupt:
+	eventsys.call('pre_exit', {})
 	sys.exit()
 finally:
 	connection.commit()

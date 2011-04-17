@@ -25,6 +25,7 @@ MODULES = (                            # loaded modules (can be found in ./modul
 	'youtube',
 	'fun',
 	'usercommands',
+	'history',
 	'feeds'
 )
 
@@ -38,7 +39,7 @@ PUBKEY_PATH   = '%s/silc.pub' % CACHE  # public key file path (for SILC)
 PRIVKEY_PATH  = '%s/silc.prv' % CACHE  # private key file path (for SILC)
 DATABASE_PATH = '%s/db.sqlite' % CACHE # path to database (will be created if it does not exist)
 
-VERSION  = '0.4.2'
+VERSION  = '0.4.3'
 GREETING = 'qllbot v%s' % VERSION      # message sent when bot joins channel
 
 ### MODULES ###

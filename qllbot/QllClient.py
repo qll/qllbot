@@ -74,6 +74,9 @@ class QllClient():
 	def notify_server_signoff(self):
 		registry.eventsys.call('server_signoff', {})
 	
+	def notify_users_response(self, channel, users):
+		registry.eventsys.call('users_response', {'channel': channel, 'users': users})
+	
 	def keep_alive(self):
 		''' Keeps client alive. If nothing gets sent to the server for about 1 minute, pysilc looses connection. '''
 		self.command_call('INFO')

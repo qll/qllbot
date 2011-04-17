@@ -19,6 +19,7 @@ class QllIrcClient(QllClient):
 		''' Interprets raw IRC commands '''
 		response = response.strip().split(' ', 3)
 		if len(response) > 2:
+		
 			if response[1] == 'JOIN':
 				self.notify_join(self.parse_user(response[0]), response[2][1:])
 			elif response[1] == 'PRIVMSG':
@@ -28,11 +29,14 @@ class QllIrcClient(QllClient):
 					self.channel_message(self.parse_user(response[0]), response[2], None, response[3][1:])
 			elif response[1] == 'INVITE':
 				self.notify_invite(response[3][1:], response[3][1:], self.parse_user(response[0]))
+			elif len(response) > 3 and (response[3].startswith('@') or response[3].startswith('=')):
+				additional = response[3][2:].split(' ', 1)
+				users      = additional[1][1:].split(' ')
+				self.notify_users_response(additional[0], users)
+				
 		elif len(response) > 1:
 			if response[0] == 'PING':
 				self.command_call('PONG %s' % response[1])
-		
-		self.buffer = ''
 
 	def run_one(self):
 		''' Checks if the socket recieved some data '''
@@ -44,6 +48,7 @@ class QllIrcClient(QllClient):
 			strings = self.buffer.split('\r\n')
 			for string in strings:
 				self.found_terminator(string)
+			self.buffer = ''
 
 	def command_call(self, command):
 		''' Sends an IRC command '''
