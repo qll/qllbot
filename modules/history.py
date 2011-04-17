@@ -62,10 +62,7 @@ def remove_from_seen(param):
 		
 		c = registry.db.cursor()
 		c.execute('SELECT time FROM seen WHERE user = ?', (user,))
-		user_exists = False
-		for row in c:
-			user_exists = True
-		if not user_exists:
+		if c.fetchone() == None:
 			c.execute('INSERT INTO seen VALUES (?, ?, ?)', (user, channel, time.time()))
 		else:
 			c.execute(
@@ -82,7 +79,7 @@ def seen(param):
 	if param in registry.history_seen:
 		return 'User currently online (%s).' % (', '.join(registry.history_seen[param]))
 	
-	result = 'Never seen this nickname.'
+	result = 'I have never seen this nickname.'
 	c = registry.db.cursor()
 	c.execute('SELECT time, channel FROM seen WHERE user = ?', (param,))
 	for row in c:
@@ -90,14 +87,14 @@ def seen(param):
 		if diff <= 3600:
 			minutes = round(diff / 60)
 			if minutes == 0:
-				ftime = 'just left %d seconds ago' % (round(diff))
+				ftime = '%d seconds ago' % (round(diff))
 			elif minutes == 1:
-				ftime = 'was seen %d minute ago' % (minutes)
+				ftime = '%d minute ago' % (minutes)
 			else:
-				ftime = 'was seen %d minutes ago' % (minutes)
+				ftime = '%d minutes ago' % (minutes)
 		else:
 			ftime  = time.strftime('%H:%M on %d.%m.%Y', time.localtime(row[0]))
-		result = '%s %s (%s).' % (param, ftime, row[1])
+		result = 'I have seen %s %s in %s.' % (param, ftime, row[1])
 	return result
 	
 

@@ -21,7 +21,7 @@ def save(param):
 	
 	# check if command already exists (UPDATE), else INSERT
 	c = registry.db.cursor()
-	c.execute('SELECT * FROM usercommands WHERE command = ? AND channel = ?', (command[0].decode('utf-8'), str(registry.cmdinterpreter.current_channel)))
+	c.execute('SELECT user FROM usercommands WHERE command = ? AND channel = ?', (command[0].decode('utf-8'), str(registry.cmdinterpreter.current_channel)))
 	# c.rowcount does not work as expected, so we use this to determine if there already is a usercommand like that
 	for row in c:
 		c.execute(
