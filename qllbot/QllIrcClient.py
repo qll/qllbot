@@ -22,6 +22,8 @@ class QllIrcClient(QllClient):
 		
 			if response[1] == 'JOIN':
 				self.notify_join(self.parse_user(response[0]), response[2][1:])
+			elif response[1] == 'PART':
+				self.notify_leave(self.parse_user(response[0]), response[2])
 			elif response[1] == 'PRIVMSG':
 				if response[2] == USERNAME:
 					self.private_message(self.parse_user(response[0]), None, response[3][1:])
