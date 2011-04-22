@@ -133,9 +133,9 @@ def get_history(param):
 		(user, channel)
 	)
 	
-	if c != None:
-		tfrom = c.fetchone()[0]
-	
+	tfrom = c.fetchone()
+	if tfrom != None:
+		tfrom = tfrom[0]
 		c.execute(
 			'SELECT * FROM history WHERE time > ? AND time < ? ORDER BY time ASC',
 			(tfrom, registry.history_seen[user][channel])
