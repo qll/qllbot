@@ -27,7 +27,6 @@ class QllIrcClient(QllClient):
 			elif response[1] == 'PRIVMSG':
 				if len(response) < 4:
 					print('Error in PRIVMSG')
-					print(self.buffer)
 					return
 				if response[2] == USERNAME:
 					self.private_message(self.parse_user(response[0]), None, response[3][1:])
@@ -51,14 +50,24 @@ class QllIrcClient(QllClient):
 		except socket.error:
 			pass
 		if self.buffer != '':
+			# debug
 			print(self.buffer)
+			
 			strings = self.buffer.split('\r\n')
+			
+			# buffer unfinished messages
+			if strings[len(strings) - 1] != '':
+				self.buffer = strings.pop()
+			else:
+				self.buffer = ''
+				
 			for string in strings:
-				self.found_terminator(string)
-			self.buffer = ''
+				self.found_terminator(string.decode('utf-8'))
 
 	def command_call(self, command):
 		''' Sends an IRC command '''
+		if isinstance(command, unicode):
+			command = command.encode('utf-8')
 		self.irc.send('%s\r\n' % command)
 	
 	def connect_to_server(self, server, port = 6667):
@@ -74,7 +83,7 @@ class QllIrcClient(QllClient):
 
 	def send_channel_message(self, channel, message):
 		''' Sends a message to a channel '''
-		for line in message.encode('utf-8').split('\n'):
+		for line in message.split('\n'):
 			# max message length of IRC = 512 (with \r\n)
 			if len(line) > 510:
 				self.command_call('PRIVMSG %s :%s' % (channel, line[:510]))
@@ -90,7 +99,7 @@ class QllIrcClient(QllClient):
 	
 	def send_private_message(self, user, message):
 		self.send_channel_message(user, message)
-			
+
 	def parse_user(self, string):
 		''' Tries to emulate something like the SilcUser object '''
 		# cut ':'

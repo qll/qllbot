@@ -13,28 +13,28 @@ def strip_tags(string):
 	''' Strips tags from a string. Should not be used unless absolutely required. '''
 	return re.sub(r'<[^>]*?>', '', string)
 
-def get_username(instance):
+def get_username(obj):
 	''' Makes sure the user is a string and not a SilcUser or IrcUser object '''
-	if not isinstance(instance, str):
-		return instance.username
+	if not isinstance(obj, basestring):
+		return obj.username
 	else:
-		return instance
+		return obj
 
-def get_channelname(instance):
+def get_channelname(obj):
 	''' Makes sure the channel name is a string and not a SilcChannel object '''
-	if not isinstance(instance, str):
-		return instance.channel_name
+	if not isinstance(obj, basestring):
+		return obj.channel_name
 	else:
-		return instance
+		return obj
 
 def send_message(channel, message):
 	''' Sends a message to a channel. '''
-	registry.client.send_channel_message(channel, message.decode('utf-8'))
+	registry.client.send_channel_message(channel, message)
 	registry.client.log_message(USERNAME, message, channel)
 
 def send_private_message(user, message):
 	''' Sends a message to an user. '''
-	registry.client.send_private_message(user, message.decode('utf-8'))
+	registry.client.send_private_message(user, message)
 	registry.client.log_message(USERNAME, message, user)
 
 def shorten_url(url):
