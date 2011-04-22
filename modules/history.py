@@ -132,22 +132,24 @@ def get_history(param):
 		'SELECT time FROM seen WHERE user = ? AND channel = ?',
 		(user, channel)
 	)
-	tfrom = c.fetchone()[0]
 	
-	c.execute(
-		'SELECT * FROM history WHERE time > ? AND time < ? ORDER BY time ASC',
-		(tfrom, registry.history_seen[user][channel])
-	)
-	result = ''
-	for row in c:
-		ftime  = time.strftime('%H:%M:%S', time.localtime(row[2]))
-		if row[4] != 1:
-			# normal message
-			result += '(%s) %s: %s\n' % (ftime, row[0], row[3])
-		else:
-			# event
-			result += '* (%s) %s %s\n' % (ftime, row[0], row[3])
-	send_private_message(registry.cmdinterpreter.current_sender, result[:-1])
+	if c != None:
+		tfrom = c.fetchone()[0]
+	
+		c.execute(
+			'SELECT * FROM history WHERE time > ? AND time < ? ORDER BY time ASC',
+			(tfrom, registry.history_seen[user][channel])
+		)
+		result = ''
+		for row in c:
+			ftime  = time.strftime('%H:%M:%S', time.localtime(row[2]))
+			if row[4] != 1:
+				# normal message
+				result += '(%s) %s: %s\n' % (ftime, row[0], row[3])
+			else:
+				# event
+				result += '* (%s) %s %s\n' % (ftime, row[0], row[3])
+		send_private_message(registry.cmdinterpreter.current_sender, result[:-1])
 
 
 subscribe('create_tables', create_seen_tables)

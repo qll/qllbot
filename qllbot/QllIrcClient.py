@@ -51,7 +51,7 @@ class QllIrcClient(QllClient):
 			pass
 		if self.buffer != '':
 			# debug
-			print(self.buffer)
+			#print(self.buffer)
 			
 			strings = self.buffer.split('\r\n')
 			
