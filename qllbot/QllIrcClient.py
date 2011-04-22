@@ -25,6 +25,10 @@ class QllIrcClient(QllClient):
 			elif response[1] == 'PART':
 				self.notify_leave(self.parse_user(response[0]), response[2])
 			elif response[1] == 'PRIVMSG':
+				if len(response) < 4:
+					print('Error in PRIVMSG')
+					print(self.buffer)
+					return
 				if response[2] == USERNAME:
 					self.private_message(self.parse_user(response[0]), None, response[3][1:])
 				else:
@@ -47,6 +51,7 @@ class QllIrcClient(QllClient):
 		except socket.error:
 			pass
 		if self.buffer != '':
+			print(self.buffer)
 			strings = self.buffer.split('\r\n')
 			for string in strings:
 				self.found_terminator(string)
@@ -74,7 +79,17 @@ class QllIrcClient(QllClient):
 			if len(line) > 510:
 				self.command_call('PRIVMSG %s :%s' % (channel, line[:510]))
 				self.send_channel_message(line[511:])
+			# todo: prevent flooding
 			self.command_call('PRIVMSG %s :%s' % (channel, line))
+			if isinstance(channel, str) and channel.startswith('#'):
+				# channel message
+				self.notify_send_channel_message(channel, line)
+			else:
+				# private message
+				self.notify_send_private_message(channel, line)
+	
+	def send_private_message(self, user, message):
+		self.send_channel_message(user, message)
 			
 	def parse_user(self, string):
 		''' Tries to emulate something like the SilcUser object '''

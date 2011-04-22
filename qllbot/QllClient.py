@@ -29,6 +29,12 @@ class QllClient():
 	def private_message(self, sender, flags, message):
 		registry.eventsys.call('private_message', {'sender': sender, 'channel': '@PM', 'flags': flags, 'message': message})
 
+	def notify_send_channel_message(self, channel, message):
+		registry.eventsys.call('send_channel_message', {'sender': USERNAME, 'channel': channel, 'flags': None, 'message': message})
+	
+	def notify_send_private_message(self, reciever, message):
+		registry.eventsys.call('send_private_message', {'sender': USERNAME, 'reciever': reciever, 'flags': None, 'message': message})
+
 	def running(self):
 		self.log_event('Running (%s-Mode)' % PROTOCOL)
 		self.connect_to_server(SERVER)

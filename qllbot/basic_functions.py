@@ -32,6 +32,11 @@ def send_message(channel, message):
 	registry.client.send_channel_message(channel, message.decode('utf-8'))
 	registry.client.log_message(USERNAME, message, channel)
 
+def send_private_message(user, message):
+	''' Sends a message to an user. '''
+	registry.client.send_private_message(user, message.decode('utf-8'))
+	registry.client.log_message(USERNAME, message, user)
+
 def shorten_url(url):
 	''' Shortens an URL. Currently uses tinyurl.com. '''
 	handle = urllib2.urlopen('http://tinyurl.com/api-create.php?url=%s' % url)

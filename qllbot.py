@@ -22,6 +22,7 @@ create_tables = False
 if not os.path.isfile(DATABASE_PATH):
 	create_tables = True
 connection = sqlite3.connect(DATABASE_PATH)
+connection.row_factory = sqlite3.Row
 
 # make globally available
 registry.db             = connection
