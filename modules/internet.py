@@ -11,12 +11,12 @@ from settings import *
 def google(param):
 	''' Starts a google search for a given string (e.g. #google test -> results for 'test') '''
 	if param == '':
-		return 'No search string submitted.'
+		return u'No search string submitted.'
 	request = urllib2.Request('http://www.google.de/search?hl=de&q=%s&btnG=Suche' % urllib2.quote(param))
 	# Google does not like strange user agents :-)
 	request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.696.3 Safari/534.24') 
 	opener  = urllib2.build_opener()
-	content = opener.open(request).read()
+	content = opener.open(request).read().decode('utf-8')
 
 	regex  = r'<li class=(g|w0)( style=[^>]+)??><div[^>]+><span[^>]+><h3 class="r"><a href="(?P<url>[^>]+)" class=l[^>]+>(?P<page_title>.*?)</a>'
 	output = 'No match.'
@@ -28,7 +28,7 @@ def google(param):
 			break
 		# strip html tags and replace &amp; with &
 		title  = strip_tags(result.group('page_title')).replace('&amp;', '&')
-		output += '%s: %s\n' % (title, result.group('url'))
+		output += u'%s: %s\n' % (title, result.group('url'))
 		i += 1
 	# cut last \n and return output
 	return output[:-1]
@@ -64,7 +64,7 @@ def get_weather(param):
 		day     = condition.find('day_of_week').attrib['data']
 		cond    = condition.find('condition').attrib['data']
 		if cond == '':
-			cond = 'Unknown condition'
+			cond = u'Unknown condition'
 		unit    = u'F'
 		if WEATHER_IN_CELSIUS:
 			# convert fahrenheit to celsius
@@ -75,7 +75,7 @@ def get_weather(param):
 			day, cond, round(minTemp), round(maxTemp), unit
 		)
 	
-	return weather[:-1].encode('utf-8')
+	return weather[:-1]
 
 def get_random_imdb(param):
 	''' Returns random movie from imdb.com '''
@@ -86,7 +86,7 @@ def get_random_imdb(param):
 	title  = re.search(r'<meta name="title" content="(?P<title>.+) \((?P<year>[0-9]{4})\) - IMDb" />', content)
 	rating = re.search(r'<span class="rating-rating">(?P<rating>[0-9](.[0-9])?)<span>/10</span></span>', content)
 	url    = re.search(r'<meta property="og:url" content="(?P<site_url>http://www.imdb.com/title/tt[0-9]+)/" />', content)
-	return '%s (%s) [Rating %s] %s' % (title.group('title'), title.group('year'), rating.group('rating'), url.group('site_url'))
+	return u'%s (%s) [Rating %s] %s' % (title.group('title'), title.group('year'), rating.group('rating'), url.group('site_url'))
 
 
 add_command('g', google)

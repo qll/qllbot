@@ -40,7 +40,7 @@ def get_feed(param):
 		items   += '%s: %s\n' % (item.find('title').text.strip(), shorten_url(item.find('link').text))
 
 	output = '[%s]\n%s' % (title.text.strip(), items[:-1])
-	return output.encode('utf-8')
+	return output
 
 
 add_command('news', get_feed)

@@ -62,7 +62,11 @@ class QllIrcClient(QllClient):
 				self.buffer = ''
 				
 			for string in strings:
-				self.found_terminator(string.decode('utf-8'))
+				try:
+					string = string.decode('utf-8')
+				except UnicodeDecodeError:
+					print('Error: UnicodeDecodeError')
+				self.found_terminator(string)
 
 	def command_call(self, command):
 		''' Sends an IRC command '''
