@@ -149,7 +149,7 @@ def get_history(param):
 			else:
 				# event
 				result += '* (%s) %s %s\n' % (ftime, row[0], row[3])
-		send_private_message(registry.cmdinterpreter.current_sender, result[:-1])
+		send_private_message(registry.cmdinterpreter.current_sender, result[:-1], True)
 
 
 subscribe('create_tables', create_seen_tables)

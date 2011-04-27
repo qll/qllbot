@@ -10,6 +10,8 @@ class QllIrcClient(QllClient):
 	def __init__(self):
 		self.buffer = ''
 		self.irc    = None
+		self.commands = []
+		self.iteration_counter = 0
 	
 	def run(self):
 		''' Starts the client '''
@@ -51,7 +53,7 @@ class QllIrcClient(QllClient):
 			pass
 		if self.buffer != '':
 			# debug
-			#print(self.buffer)
+			print(self.buffer)
 			
 			strings = self.buffer.split('\r\n')
 			
@@ -68,12 +70,26 @@ class QllIrcClient(QllClient):
 					print('Error: UnicodeDecodeError')
 				self.found_terminator(string)
 
-	def command_call(self, command):
+		# done here, because we want to prevent flooding
+		self.iteration_counter += 1
+		if self.iteration_counter >= 5:
+			self.command_iteration()
+			self.iteration_counter = 0
+
+	def command_call(self, command, delay = False):
 		''' Sends an IRC command '''
 		if isinstance(command, unicode):
 			command = command.encode('utf-8')
-		self.irc.send('%s\r\n' % command)
+		if not delay:
+			self.irc.send('%s\r\n' % command)
+		else:
+			self.commands.append(command)
 	
+	def command_iteration(self):
+		if len(self.commands) > 0:
+			command = self.commands.pop(0)
+			self.irc.send('%s\r\n' % command)
+
 	def connect_to_server(self, server, port = 6667):
 		''' Connects to a IRC Server '''
 		if PORT != '':
@@ -85,15 +101,14 @@ class QllIrcClient(QllClient):
 		self.command_call('USER %s %d %d :%s' % (USERNAME, 0, 0, REALNAME))
 		self.connected_to_server()
 
-	def send_channel_message(self, channel, message):
+	def send_channel_message(self, channel, message, delay = False):
 		''' Sends a message to a channel '''
 		for line in message.split('\n'):
 			# max message length of IRC = 512 (with \r\n)
 			if len(line) > 510:
-				self.command_call('PRIVMSG %s :%s' % (channel, line[:510]))
+				self.command_call('PRIVMSG %s :%s' % (channel, line[:510]), delay)
 				self.send_channel_message(line[511:])
-			# todo: prevent flooding
-			self.command_call('PRIVMSG %s :%s' % (channel, line))
+			self.command_call('PRIVMSG %s :%s' % (channel, line), delay)
 			if isinstance(channel, str) and channel.startswith('#'):
 				# channel message
 				self.notify_send_channel_message(channel, line)
@@ -101,8 +116,8 @@ class QllIrcClient(QllClient):
 				# private message
 				self.notify_send_private_message(channel, line)
 	
-	def send_private_message(self, user, message):
-		self.send_channel_message(user, message)
+	def send_private_message(self, user, message, delay = False):
+		self.send_channel_message(user, message, delay)
 
 	def parse_user(self, string):
 		''' Tries to emulate something like the SilcUser object '''

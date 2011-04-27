@@ -27,14 +27,14 @@ def get_channelname(obj):
 	else:
 		return obj
 
-def send_message(channel, message):
+def send_message(channel, message, delay = False):
 	''' Sends a message to a channel. '''
-	registry.client.send_channel_message(channel, message)
+	registry.client.send_channel_message(channel, message, delay)
 	registry.client.log_message(USERNAME, message, channel)
 
-def send_private_message(user, message):
+def send_private_message(user, message, delay = False):
 	''' Sends a message to an user. '''
-	registry.client.send_private_message(user, message)
+	registry.client.send_private_message(user, message, delay)
 	registry.client.log_message(USERNAME, message, user)
 
 def shorten_url(url):
