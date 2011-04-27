@@ -63,7 +63,7 @@ class QllIrcClient(QllClient):
 				
 			for string in strings:
 				try:
-					string = string.decode('utf-8')
+					string = string.decode('utf-8', 'replace')
 				except UnicodeDecodeError:
 					print('Error: UnicodeDecodeError')
 				self.found_terminator(string)
