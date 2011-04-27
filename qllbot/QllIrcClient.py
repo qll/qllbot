@@ -109,11 +109,16 @@ class QllIrcClient(QllClient):
 		# cut ':'
 		string = string[1:] 
 		string = string.split('@')
-		username = string[0].split('!~')
+		username = string[0]
+		realname = ''
+		if '!~' in username:
+			username = username.split('!~')
+			realname = username[1]
+			username = username[0]
 		user = IrcUser()
-		user.username = username[0]
-		user.nickname = username[0]
-		user.realname = username[1]
+		user.username = username
+		user.nickname = username
+		user.realname = realname
 		user.hostname = string[1]
 		return user
 
