@@ -80,13 +80,29 @@ def get_weather(param):
 def get_random_imdb(param):
 	''' Returns random movie from imdb.com '''
 	handle = urllib2.urlopen('http://www.imdb.com/random/title')
-	content = handle.read()
+	content = handle.read().decode('utf-8')
 	handle.close()
+
+	seriesMatch = re.search(r'<meta name="title" content=".+ \(TV Series', content)
+	if seriesMatch != None:
+		# found a tv series ... try again
+		return get_random_imdb(param)
+	titleMatch  = re.search(r'<meta name="title" content="(?P<title>.+) \((?P<year>[0-9]{4})\) - IMDb" />', content)
+	ratingMatch = re.search(r'<span class="rating-rating">(?P<rating>[0-9](.[0-9])?)<span>/10</span></span>', content)
+	urlMatch    = re.search(r'<meta property="og:url" content="(?P<site_url>http://www.imdb.com/title/tt[0-9]+)/" />', content)
 	
-	title  = re.search(r'<meta name="title" content="(?P<title>.+) \((?P<year>[0-9]{4})\) - IMDb" />', content)
-	rating = re.search(r'<span class="rating-rating">(?P<rating>[0-9](.[0-9])?)<span>/10</span></span>', content)
-	url    = re.search(r'<meta property="og:url" content="(?P<site_url>http://www.imdb.com/title/tt[0-9]+)/" />', content)
-	return u'%s (%s) [Rating %s] %s' % (title.group('title'), title.group('year'), rating.group('rating'), url.group('site_url'))
+	title  = u''
+	year   = u''
+	rating = u''
+	url    = u''
+	if titleMatch != None:
+		title = titleMatch.group('title')
+		year  = titleMatch.group('year')
+	if ratingMatch != None:
+		rating = ratingMatch.group('rating')
+	if urlMatch != None:
+		url = urlMatch.group('site_url')
+	return u'%s (%s) [Rating %s] %s' % (title, year, rating, url)
 
 
 add_command('g', google)
