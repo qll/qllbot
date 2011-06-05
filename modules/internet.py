@@ -12,7 +12,8 @@ def google(param):
 	''' Starts a google search for a given string (e.g. #google test -> results for 'test') '''
 	if param == '':
 		return u'No search string submitted.'
-	request = urllib2.Request('http://www.google.de/search?hl=de&q=%s&btnG=Suche' % urllib2.quote(param))
+	param   = urllib2.quote(param.encode('ascii', 'replace'))
+	request = urllib2.Request('http://www.google.de/search?hl=de&q=%s&btnG=Suche' % param)
 	# Google does not like strange user agents :-)
 	request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.696.3 Safari/534.24') 
 	opener  = urllib2.build_opener()
