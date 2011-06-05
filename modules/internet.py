@@ -12,7 +12,7 @@ def google(param):
 	''' Starts a google search for a given string (e.g. #google test -> results for 'test') '''
 	if param == '':
 		return u'No search string submitted.'
-	param   = urllib2.quote(param.encode('ascii', 'replace'))
+	param   = urllib2.quote(param.encode('utf8', 'replace'))
 	request = urllib2.Request('http://www.google.de/search?hl=de&q=%s&btnG=Suche' % param)
 	# Google does not like strange user agents :-)
 	request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.696.3 Safari/534.24') 
@@ -42,7 +42,8 @@ def get_weather(param):
 			return 'Invalid location. Use city name or postal code.'
 		location = param
 	try:
-		handle = urllib2.urlopen('http://www.google.com/ig/api?weather=%s' % urllib2.quote(location))
+		location = urllib2.quote(location.encode('utf8', 'replace'))
+		handle   = urllib2.urlopen('http://www.google.com/ig/api?weather=%s' % location)
 	except:
 		return 'Error opening URL.'
 	tree = ElementTree()
