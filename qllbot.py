@@ -62,11 +62,13 @@ try:
 		client.run_one()
 		time.sleep(0.2)
 		
-		if SEND_KEEP_ALIVE:
-			timer += 1
-			# 20 seconds
-			if timer >= 100:
-				timer = 0
+		timer += 1
+		# 20 seconds
+		if timer >= 100:
+			timer = 0
+			# commit to database every 20 seconds
+			connection.commit()
+			if SEND_KEEP_ALIVE:
 				client.keep_alive()
 except KeyboardInterrupt:
 	eventsys.call('pre_exit', {})
