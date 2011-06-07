@@ -41,6 +41,7 @@ DATABASE_PATH = '%s/db.sqlite' % CACHE # path to database (will be created if it
 
 VERSION  = '0.4.6'
 GREETING = 'qllbot v%s' % VERSION      # message sent when bot joins channel
+DEBUG    = False                       # print all socket messages to the console
 
 ### MODULES ###
 # internet

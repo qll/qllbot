@@ -77,6 +77,9 @@ class QllClient():
 	def notify_motd(self, message):
 		registry.eventsys.call('motd', {'message': message})
 	
+	def notify_mode(self, user, channel, mode):
+		registry.eventsys.call('mode', {'user': user, 'channel': channel, 'mode': mode})
+	
 	def notify_server_signoff(self):
 		registry.eventsys.call('server_signoff', {})
 	

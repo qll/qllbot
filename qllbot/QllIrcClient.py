@@ -36,6 +36,11 @@ class QllIrcClient(QllClient):
 					self.channel_message(self.parse_user(response[0]), response[2], None, response[3][1:])
 			elif response[1] == 'INVITE':
 				self.notify_invite(response[3][1:], response[3][1:], self.parse_user(response[0]))
+			elif response[1] == 'MODE':
+				if (response[2].startswith('#')):
+					# MODE in channel (+o or similar)
+					usermode = response[3].split(' ')
+					self.notify_mode(usermode[1], response[2], usermode[0])
 			elif len(response) > 3 and (response[3].startswith('@') or response[3].startswith('=')):
 				additional = response[3][2:].split(' ', 1)
 				users      = additional[1][1:].split(' ')
@@ -53,7 +58,8 @@ class QllIrcClient(QllClient):
 			pass
 		if self.buffer != '':
 			# debug
-		    #print(self.buffer)
+			if DEBUG:
+				print(self.buffer)
 			
 			strings = self.buffer.split('\r\n')
 			

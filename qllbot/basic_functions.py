@@ -37,6 +37,12 @@ def send_private_message(user, message, delay = False):
 	registry.client.send_private_message(user, message, delay)
 	registry.client.log_message(USERNAME, message, user)
 
+def is_op(channel):
+	''' Checks if the bot is op in that channel '''
+	if channel in registry.channels.keys():
+		return registry.channels[channel]
+	return False
+
 def shorten_url(url):
 	''' Shortens an URL. Currently uses tinyurl.com. '''
 	handle = urllib2.urlopen('http://tinyurl.com/api-create.php?url=%s' % url)
