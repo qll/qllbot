@@ -7,6 +7,9 @@ from qllbot.Interpreter import Interpreter
 from settings import *
 
 
+# set cwd
+os.chdir(os.path.abspath(os.path.dirname(__file__)))
+
 if not os.path.isdir(CACHE):
 	os.mkdir(CACHE, 0750)
 
