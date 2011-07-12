@@ -39,7 +39,5 @@ a terminal. Everything should work fine now.
 
 ## Run as background process ##
 
-Currently qllbot does not support this function. Anyways, it is possible to run
-it as a background process besides it does not support it right now. Take a look
-at [**GNU Screen**](http://www.gnu.org/software/screen/).
-
+Forking qllbot to a background process is as simple as adding the -d flag to its
+parameters. Example: <code>$ python qllbot.py -d</code>. 
