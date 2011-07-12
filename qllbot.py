@@ -10,6 +10,11 @@ from settings import *
 # set cwd
 os.chdir(os.path.abspath(os.path.dirname(__file__)))
 
+# daemonize if required
+if len(sys.argv) > 1 and sys.argv[1] == '-d':
+	from qllbot.daemonize import daemonize
+	daemonize()
+
 if not os.path.isdir(CACHE):
 	os.mkdir(CACHE, 0750)
 
