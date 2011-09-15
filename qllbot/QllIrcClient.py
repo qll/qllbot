@@ -1,13 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys, socket
+from re import match
 from settings import *
 from qllbot.QllClient import QllClient
 from qllbot.IrcUser import IrcUser
+from qllbot.Registry import Registry
 
 
 # constants which should not be changed
 MAX_MESSAGE_SIZE = 512
+
+
+# event system
+events = Registry().eventsys
 
 
 class QllIrcClient(QllClient):
@@ -21,38 +27,65 @@ class QllIrcClient(QllClient):
 		''' Starts the client '''
 		self.running()
 	
+	
 	def found_terminator(self, response):
-		''' Interprets raw IRC commands '''
-		response = response.strip().split(' ', 3)
-		if len(response) > 2:
-		
-			if response[1] == 'JOIN':
-				self.notify_join(self.parse_user(response[0]), response[2][1:])
-			elif response[1] == 'PART':
-				self.notify_leave(self.parse_user(response[0]), response[2])
-			elif response[1] == 'PRIVMSG':
-				if len(response) < 4:
-					print('Error in PRIVMSG')
-					return
-				if response[2] == USERNAME:
-					self.private_message(self.parse_user(response[0]), None, response[3][1:])
-				else:
-					self.channel_message(self.parse_user(response[0]), response[2], None, response[3][1:])
-			elif response[1] == 'INVITE':
-				self.notify_invite(response[3][1:], response[3][1:], self.parse_user(response[0]))
-			elif response[1] == 'MODE':
-				if (response[2].startswith('#')):
-					# MODE in channel (+o or similar)
-					usermode = response[3].split(' ')
-					self.notify_mode(usermode[1], response[2], usermode[0])
-			elif len(response) > 3 and (response[3].startswith('@') or response[3].startswith('=')):
-				additional = response[3][2:].split(' ', 1)
-				users      = additional[1][1:].split(' ')
-				self.notify_users_response(additional[0], users)
-				
-		elif len(response) > 1:
-			if response[0] == 'PING':
-				self.command_call('PONG %s' % response[1])
+		''' Interprets IRC commands. '''
+		re_user = r':(?P<nick>.*?)!~(?P<name>.*?)@(?P<host>.*?) '
+
+		# channel message
+		regex = match(re_user + r'PRIVMSG (?P<channel>#.+?) :(?P<message>.*)', response)
+		if (regex):
+			sender = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
+			events.call('channel_message', {'sender': sender, 'channel': regex.group('channel'), 'flags': '', 'message': regex.group('message')})
+			return
+		# private message
+		regex = match(re_user + r'PRIVMSG .+? :(?P<message>.*)', response)
+		if (regex):
+			sender = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
+			events.call('private_message', {'sender': sender, 'channel': '@PM', 'flags': '', 'message': regex.group('message')})
+			return
+		# user joined channel
+		regex = match(re_user + r'JOIN (?P<channel>#.+)', response)
+		if (regex):
+			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
+			events.call('join', {'channel': regex.group('channel'), 'user': user})
+			return
+		# user left channel
+		regex = match(re_user + r'PART (?P<channel>#.+)', response)
+		if (regex):
+			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
+			events.call('leave', {'channel': regex.group('channel'), 'user': user})
+			return
+		# PING
+		regex = match(r'PING (?P<pong>.*)', response)
+		if (regex):
+			self.command_call('PONG ' + regex.group('pong'))
+			return
+		# channel invite
+		regex = match(re_user + r'INVITE .+? :(?P<channel>#.+)', response)
+		if (regex):
+			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
+			events.call('invite', {'channel': regex.group('channel'), 'user': user})
+			return
+		# mode command
+		regex = match(re_user + r'MODE (?P<channel>#.+) (?P<mode>.+?) (?P<user>.+?)', response)
+		if (regex):
+			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
+			events.call('mode', {'from': user, 'user': regex.group('user'), 'channel': regex.group('channel'), 'mode': regex.group('mode')})
+			return
+		# users command (issued when joining a channel)
+		regex = match(r':.+? [\d]+ .+? [@=]{1} (?P<channel>#.+) :(?P<users>.+)', response)
+		if (regex):
+			events.call('users_response', {'channel': regex.group('channel'), 'users': regex.group('users').split(' ')})
+			return
+		# kicked from channel
+		regex = match(re_user + r'KICK (?P<channel>#.+?) (?P<kicked>.+?) :(?P<message>.*)', response)
+		if (regex):
+			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
+			events.call('kicked', {'kicked': regex.group('kicked'), 'message': regex.group('message'), 'kicker': user, 'channel': regex.group('channel')})
+			return
+		# unknown message
+		#print(response)
 
 	def run_one(self):
 		''' Checks if the socket recieved some data '''
@@ -75,10 +108,11 @@ class QllIrcClient(QllClient):
 				
 			for string in strings:
 				try:
-					string = string.decode('utf-8', 'replace')
+					string = string.decode('utf-8', 'replace').strip()
+					if string != '':
+						self.found_terminator(string)
 				except UnicodeDecodeError:
 					print('Error: UnicodeDecodeError')
-				self.found_terminator(string)
 
 		# done here, because we want to prevent flooding
 		self.iteration_counter += 1
@@ -129,21 +163,11 @@ class QllIrcClient(QllClient):
 	def send_private_message(self, user, message, delay = False):
 		self.send_channel_message(user, message, delay)
 
-	def parse_user(self, string):
-		''' Tries to emulate something like the SilcUser object '''
-		# cut ':'
-		string = string[1:] 
-		string = string.split('@')
-		username = string[0]
-		realname = ''
-		if '!~' in username:
-			username = username.split('!~')
-			realname = username[1]
-			username = username[0]
+	def create_IrcUser(self, nickname, realname, host):
 		user = IrcUser()
-		user.username = username
-		user.nickname = username
+		user.nickname = nickname
+		user.username = nickname
 		user.realname = realname
-		user.hostname = string[1]
+		user.host     = host
 		return user
 

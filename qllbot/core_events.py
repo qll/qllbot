@@ -34,7 +34,7 @@ def log_leave_channel(param):
 def join_invited_channel(param):
 	''' Joins a channel the bot gets invited to (by his owner) '''
 	if param['user'].username == OWNER:
-		registry.client.command_call('JOIN %s' % param['channel_name'])	
+		registry.client.command_call('JOIN %s' % param['channel'])	
 
 def get_op_from_userlist(param):
 	''' Verifies if the bot has op status '''
