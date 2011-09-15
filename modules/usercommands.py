@@ -8,7 +8,7 @@ from qllbot.basic_functions import send_message, get_username, get_channelname
 registry = Registry()
 
 
-def create_usercommands_tables(param):
+def create_usercommands_tables():
 	registry.db.execute('CREATE TABLE usercommands (user TEXT, channel TEXT, command TEXT, value TEXT)')
 
 def save(param):
@@ -37,15 +37,15 @@ def save(param):
 	)
 	return u'Usercommand saved. Execute with !%s' % command[0]
 
-def interpret_usercommand(param):
-	if param['message'][:1] == USERCOMMANDS_TOKEN:
-		command = param['message'][1:].strip()
+def interpret_usercommand(sender, channel, message):
+	if message[:1] == USERCOMMANDS_TOKEN:
+		command = message[1:].strip()
 		c = registry.db.cursor()
-		c.execute('SELECT * FROM usercommands WHERE command = ? AND channel = ?', (command, get_channelname(param['channel'])))
+		c.execute('SELECT * FROM usercommands WHERE command = ? AND channel = ?', (command, get_channelname(channel)))
 		for row in c:
-			send_message(param['channel'], row[3])
+			send_message(channel, row[3])
 
 
-subscribe('create_tables', create_usercommands_tables)
+subscribe('create_tables',   create_usercommands_tables)
 subscribe('channel_message', interpret_usercommand)
 add_command('save', save)

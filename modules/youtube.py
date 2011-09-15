@@ -8,9 +8,9 @@ from qllbot.static_vars import *
 from qllbot.basic_functions import send_message
 
 
-def display_youtube_video_title(param):
+def display_youtube_video_title(sender, channel, message):
 	''' Checks every message sent for a youtube link and displays title and uploader information '''
-	results = re.finditer(r'http://(www\.)?youtube\.com/watch\?.*?v=(?P<id>[-_\w]{11})', param['message'])
+	results = re.finditer(r'http://(www\.)?youtube\.com/watch\?.*?v=(?P<id>[-_\w]{11})', message) 
 	output = u''
 	for result in results:
 		handle = None
@@ -35,7 +35,7 @@ def display_youtube_video_title(param):
 		# strip last \n in output
 		output = output[:-1]
 		# send message back to channel
-		send_message(param['channel'], output)
+		send_message(channel, output)
 
 
 subscribe('channel_message', display_youtube_video_title)

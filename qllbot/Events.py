@@ -11,7 +11,7 @@ class Events(Singleton):
 		else:
 			self.events[event] = [function,]
 	
-	def call(self, event, param):
+	def call(self, event, *param):
 		if event in self.events:
 			for function in self.events[event]:
-				function(param)
+				function(*param)

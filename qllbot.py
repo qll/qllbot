@@ -60,8 +60,8 @@ cmdinterpreter.load_modules(MODULES)
 
 # write database tables and initial data (if needed)
 if create_tables:
-	eventsys.call('create_tables', {})
-	eventsys.call('insert_into_created_tables', {})
+	eventsys.call('create_tables')
+	eventsys.call('insert_into_created_tables')
 
 try:
 	client.run()
@@ -79,7 +79,7 @@ try:
 			if SEND_KEEP_ALIVE:
 				client.keep_alive()
 except KeyboardInterrupt:
-	eventsys.call('pre_exit', {})
+	eventsys.call('pre_exit')
 	sys.exit()
 finally:
 	connection.commit()

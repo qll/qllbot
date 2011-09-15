@@ -17,7 +17,6 @@ CHANNELS         = {                   # channels to connect to {'NAME': 'PASSWO
 SEND_KEEP_ALIVE  = False               # Default: False. Some network configurations
                                        # require the bot to send data every 20 seconds.
                                        # Use this, if you get "silent" disconnects.
-
 MODULES = (                            # loaded modules (can be found in ./modules)
 	'core',
 	'basic',
@@ -39,7 +38,7 @@ PUBKEY_PATH   = '%s/silc.pub' % CACHE  # public key file path (for SILC)
 PRIVKEY_PATH  = '%s/silc.prv' % CACHE  # private key file path (for SILC)
 DATABASE_PATH = '%s/db.sqlite' % CACHE # path to database (will be created if it does not exist)
 
-VERSION  = '0.6'
+VERSION  = '0.6.1'
 GREETING = 'qllbot v%s' % VERSION      # message sent when bot joins channel
 DEBUG    = False                       # print all socket messages to the console
 

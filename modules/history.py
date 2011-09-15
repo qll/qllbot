@@ -15,25 +15,25 @@ registry = Registry()
 registry.history_seen = {}
 
 
-def create_seen_tables(param):
+def create_seen_tables():
 	registry.db.execute('CREATE TABLE seen (user TEXT, channel TEXT, time INTEGER)')
 
-def seen_joined_channel(param):
+def seen_joined_channel(channel, users):
 	''' Gets USER command replys and checks for new users '''
-	for user in param['users']:
-		add_to_seen({'user': user, 'channel': param['channel']})
+	for user in users:
+		add_to_seen(user, channel)
 
-def seen_write_changes(param):
+def seen_write_changes():
 	''' Writes changes to the database (when the bot quits). '''
 	iterator = deepcopy(registry.history_seen)
 	for user, channels in iterator.iteritems():
 		for channel in channels:
-			remove_from_seen({'user': user, 'channel': channel})
+			remove_from_seen(user, channel)
 
-def add_to_seen(param):
+def add_to_seen(user, channel):
 	''' Adds a user to the global seen dictionary '''
-	user    = get_username(param['user'])
-	channel = get_channelname(param['channel'])
+	user    = get_username(user)
+	channel = get_channelname(channel)
 	
 	# remove op status from nicknames
 	if user.startswith('@'):
@@ -46,11 +46,11 @@ def add_to_seen(param):
 		if not channel in registry.history_seen[user].keys():
 			registry.history_seen[user][channel] = time.time()
 
-def remove_from_seen(param):
+def remove_from_seen(user, channel):
 	''' Removes an user from registry.history_seen and writes him/her to the database. '''
 	# todo: write leave event for irc
-	user    = get_username(param['user'])
-	channel = get_channelname(param['channel'])
+	user    = get_username(user)
+	channel = get_channelname(channel)
 	
 	# the bot should not write itsself into the database
 	if user != USERNAME and user in registry.history_seen.keys():
@@ -101,13 +101,13 @@ def seen(param):
 	else:
 		return 'I have never seen this nickname.'
 
-def create_history_tables(param):
+def create_history_tables():
 	registry.db.execute('CREATE TABLE history (user TEXT, channel TEXT, time INTEGER, message TEXT, event INTEGER)')
 
-def add_history_message(param):
+def add_history_message(sender, channel, message):
 	registry.db.execute(
 		'INSERT INTO history VALUES (?, ?, ?, ?, 0)',
-		(get_username(param['sender']), get_channelname(param['channel']), time.time(), param['message'])
+		(get_username(sender), get_channelname(channel), time.time(), message)
 	)
 
 def add_history_event(user, channel, message):
@@ -116,11 +116,11 @@ def add_history_event(user, channel, message):
 		(get_username(user), get_channelname(channel), time.time(), message)
 	)
 
-def add_history_event_join(param):
-	add_history_event(param['user'], param['channel'], 'joined the channel')
+def add_history_event_join(user, channel):
+	add_history_event(user, channel, 'joined the channel')
 
-def add_history_event_leave(param):
-	add_history_event(param['user'], param['channel'], 'left the channel')
+def add_history_event_leave(user, channel):
+	add_history_event(user, channel, 'left the channel')
 
 def get_history(param):
 	''' Sends a private message to you with all messages written while you were offline. '''
@@ -159,9 +159,10 @@ subscribe('join', add_to_seen)
 subscribe('leave', remove_from_seen)
 add_command('seen', seen)
 
-subscribe('create_tables', create_history_tables)
-subscribe('channel_message', add_history_message)
-subscribe('send_channel_message', add_history_message)
-subscribe('join', add_history_event_join)
-subscribe('leave', add_history_event_leave)
-add_command('history', get_history)
+# buggy
+#subscribe('create_tables', create_history_tables)
+#subscribe('channel_message', add_history_message)
+#subscribe('send_channel_message', add_history_message)
+#subscribe('join', add_history_event_join)
+#subscribe('leave', add_history_event_leave)
+#add_command('history', get_history)

@@ -27,7 +27,6 @@ class QllIrcClient(QllClient):
 		''' Starts the client '''
 		self.running()
 	
-	
 	def found_terminator(self, response):
 		''' Interprets IRC commands. '''
 		re_user = r':(?P<nick>.*?)!~(?P<name>.*?)@(?P<host>.*?) '
@@ -36,25 +35,25 @@ class QllIrcClient(QllClient):
 		regex = match(re_user + r'PRIVMSG (?P<channel>#.+?) :(?P<message>.*)', response)
 		if (regex):
 			sender = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
-			events.call('channel_message', {'sender': sender, 'channel': regex.group('channel'), 'flags': '', 'message': regex.group('message')})
+			events.call('channel_message', sender, regex.group('channel'), regex.group('message'))
 			return
 		# private message
 		regex = match(re_user + r'PRIVMSG .+? :(?P<message>.*)', response)
 		if (regex):
 			sender = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
-			events.call('private_message', {'sender': sender, 'channel': '@PM', 'flags': '', 'message': regex.group('message')})
+			events.call('private_message', sender, regex.group('message'))
 			return
 		# user joined channel
 		regex = match(re_user + r'JOIN (?P<channel>#.+)', response)
 		if (regex):
 			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
-			events.call('join', {'channel': regex.group('channel'), 'user': user})
+			events.call('join', user, regex.group('channel'))
 			return
 		# user left channel
 		regex = match(re_user + r'PART (?P<channel>#.+)', response)
 		if (regex):
 			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
-			events.call('leave', {'channel': regex.group('channel'), 'user': user})
+			events.call('leave', user, regex.group('channel'))
 			return
 		# PING
 		regex = match(r'PING (?P<pong>.*)', response)
@@ -65,24 +64,24 @@ class QllIrcClient(QllClient):
 		regex = match(re_user + r'INVITE .+? :(?P<channel>#.+)', response)
 		if (regex):
 			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
-			events.call('invite', {'channel': regex.group('channel'), 'user': user})
+			events.call('invite', user, regex.group('channel'))
 			return
 		# mode command
 		regex = match(re_user + r'MODE (?P<channel>#.+) (?P<mode>.+?) (?P<user>.+?)', response)
 		if (regex):
 			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
-			events.call('mode', {'from': user, 'user': regex.group('user'), 'channel': regex.group('channel'), 'mode': regex.group('mode')})
+			events.call('mode', user, regex.group('channel'), regex.group('mode'), regex.group('user'))
 			return
 		# users command (issued when joining a channel)
 		regex = match(r':.+? [\d]+ .+? [@=]{1} (?P<channel>#.+) :(?P<users>.+)', response)
 		if (regex):
-			events.call('users_response', {'channel': regex.group('channel'), 'users': regex.group('users').split(' ')})
+			events.call('users_response', regex.group('channel'), regex.group('users').split(' '))
 			return
 		# kicked from channel
 		regex = match(re_user + r'KICK (?P<channel>#.+?) (?P<kicked>.+?) :(?P<message>.*)', response)
 		if (regex):
 			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
-			events.call('kicked', {'kicked': regex.group('kicked'), 'message': regex.group('message'), 'kicker': user, 'channel': regex.group('channel')})
+			events.call('kicked', user, regex.group('channel'), regex.group('kicked'), regex.group('message'))
 			return
 		# unknown message
 		#print(response)
