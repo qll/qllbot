@@ -6,6 +6,10 @@ from qllbot.QllClient import QllClient
 from qllbot.IrcUser import IrcUser
 
 
+# constants which should not be changed
+MAX_MESSAGE_SIZE = 512
+
+
 class QllIrcClient(QllClient):
 	def __init__(self):
 		self.buffer = ''
@@ -111,9 +115,9 @@ class QllIrcClient(QllClient):
 		''' Sends a message to a channel '''
 		for line in message.split('\n'):
 			# max message length of IRC = 512 (with \r\n)
-			if len(line) > 510:
-				self.command_call('PRIVMSG %s :%s' % (channel, line[:510]), delay)
-				self.send_channel_message(line[511:])
+			if len(line) > (MAX_MESSAGE_SIZE - 2):
+				self.command_call('PRIVMSG %s :%s' % (channel, line[:(MAX_MESSAGE_SIZE - 2)]), delay)
+				self.send_channel_message(line[(MAX_MESSAGE_SIZE - 1):])
 			self.command_call('PRIVMSG %s :%s' % (channel, line), delay)
 			if isinstance(channel, str) and channel.startswith('#'):
 				# channel message
