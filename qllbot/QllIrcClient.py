@@ -22,8 +22,8 @@ class QllIrcClient(QllClient):
 	irc_regex = (
 		('channel_message', True,  r'PRIVMSG (?P<channel>#.+?) :(?P<message>.*)'),
 		('private_message', True,  r'PRIVMSG .+? :(?P<message>.*)'), 
-		('join',            True,  r'JOIN (?P<channel>#.+)'),
-		('leave',           True,  r'PART (?P<channel>#.+)'),
+		('join',            True,  r'JOIN :{0,1}(?P<channel>#.+)'),
+		('leave',           True,  r'PART :{0,1}(?P<channel>#.+)'),
 		('invite',          True,  r'INVITE .+? :(?P<channel>#.+)'),
 		('mode',            True,  r'MODE (?P<channel>#.+) (?P<mode>.+?) (?P<user>.+?)'),
 		('kicked',          True,  r'KICK (?P<channel>#.+?) (?P<kicked>.+?) :(?P<message>.*)'),

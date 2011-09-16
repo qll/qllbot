@@ -159,7 +159,7 @@ subscribe('join', add_to_seen)
 subscribe('leave', remove_from_seen)
 add_command('seen', seen)
 
-# buggy
+# buggy stuff :C
 #subscribe('create_tables', create_history_tables)
 #subscribe('channel_message', add_history_message)
 #subscribe('send_channel_message', add_history_message)
