@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import random
 from qllbot.Registry import *
+from settings import *
 
 
 def get_z0r(param):

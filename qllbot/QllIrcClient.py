@@ -25,7 +25,7 @@ class QllIrcClient(QllClient):
 		('join',            True,  r'JOIN :{0,1}(?P<channel>#.+)'),
 		('leave',           True,  r'PART :{0,1}(?P<channel>#.+)'),
 		('invite',          True,  r'INVITE .+? :(?P<channel>#.+)'),
-		('mode',            True,  r'MODE (?P<channel>#.+) (?P<mode>.+?) (?P<user>.+?)'),
+		('mode',            True,  r'MODE (?P<channel>#.+) (?P<mode>.+?) (?P<user>.+)'),
 		('kicked',          True,  r'KICK (?P<channel>#.+?) (?P<kicked>.+?) :(?P<message>.*)'),
 		('users_response',  False, r':.+? [\d]+ .+? [@=]{1} (?P<channel>#.+) :(?P<users>.+)'),
 		# internally used events

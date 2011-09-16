@@ -21,6 +21,7 @@ SEND_KEEP_ALIVE  = False               # Default: False. Some networks with with
 MODULES = (                            # loaded modules (can be found in ./modules)
 	'core',
 	'basic',
+	'admin',
 	'internet',
 	'youtube',
 	'fun',
@@ -39,17 +40,19 @@ PUBKEY_PATH   = '%s/silc.pub' % CACHE  # public key file path (for SILC)
 PRIVKEY_PATH  = '%s/silc.prv' % CACHE  # private key file path (for SILC)
 DATABASE_PATH = '%s/db.sqlite' % CACHE # path to database (will be created if it does not exist)
 
-VERSION  = '0.6.2'
+VERSION  = '0.6.3'
 GREETING = 'qllbot v%s' % VERSION      # message sent when bot joins channel
 DEBUG    = False                       # print all socket messages to the console
 
 ### MODULES ###
+# admin
+AUTO_OP_OWNER = True                   # if owner joins channel give him op if the bot has sufficient rights
 # internet
 WEATHER_LOCATION   = 'Bochum'          # default weather location (if #weather gets no parameters)
 WEATHER_IN_CELSIUS = True              # converts #weather results in °C
 GOOGLE_MAX_RESULTS = 3                 # displayed google results
 # fun
-ZOR_MAX = 3411
+ZOR_MAX = 3411                         # Highest known z0r.de id
 # usercommands
 USERCOMMANDS_TOKEN = '!'               # marks a usercommand
 # feeds
