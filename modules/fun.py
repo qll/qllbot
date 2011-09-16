@@ -6,7 +6,7 @@ from qllbot.Registry import *
 
 def get_z0r(param):
 	''' Returns random z0r.de link. '''
-	return 'http://z0r.de/%d' %  random.randint(1, 2668)
+	return 'http://z0r.de/%d' %  random.randint(1, ZOR_MAX)
 
 def answer_yesno(param):
 	''' Answers yes or no to a question. '''
@@ -14,6 +14,7 @@ def answer_yesno(param):
 		return 'yes.'
 	else:
 		return 'no.'
+
 
 add_command('z0r', get_z0r)
 add_command('zor', get_z0r)

@@ -48,6 +48,8 @@ DEBUG    = False                       # print all socket messages to the consol
 WEATHER_LOCATION   = 'Bochum'          # default weather location (if #weather gets no parameters)
 WEATHER_IN_CELSIUS = True              # converts #weather results in °C
 GOOGLE_MAX_RESULTS = 3                 # displayed google results
+# fun
+ZOR_MAX = 3411
 # usercommands
 USERCOMMANDS_TOKEN = '!'               # marks a usercommand
 # feeds

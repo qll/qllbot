@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import urllib2
-import re
+import urllib2, re
 from xml.etree.ElementTree import ElementTree
 from qllbot.basic_functions import strip_tags
 from qllbot.Registry import *

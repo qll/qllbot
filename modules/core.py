@@ -9,7 +9,7 @@ registry = Registry()
 
 def get_version(param):
 	''' Returns the version qllbot currently runs on. '''
-	return 'qllbot Version %s' % VERSION
+	return 'qllbot version %s' % VERSION
 
 def get_loaded_commands(param):
 	''' Returns all loaded commands. '''
