@@ -11,8 +11,8 @@ from qllbot.Registry  import Registry
 MAX_MESSAGE_SIZE = 512
 
 
-# event system
-events = Registry().eventsys
+registry = Registry()
+events   = registry.eventsys
 
 
 class QllIrcClient(QllClient):
@@ -28,6 +28,8 @@ class QllIrcClient(QllClient):
 		('mode',            True,  r'MODE (?P<channel>#.+) (?P<mode>.+?) (?P<user>.+?)'),
 		('kicked',          True,  r'KICK (?P<channel>#.+?) (?P<kicked>.+?) :(?P<message>.*)'),
 		('users_response',  False, r':.+? [\d]+ .+? [@=]{1} (?P<channel>#.+) :(?P<users>.+)'),
+		# internally used events
+		('nickname_in_use', False, r':.+? [\d]+ \* .+? :Nickname is already in use\.'),
 		('ping',            False, r'PING (?P<pong>.*)')
 	)
 	regex_user = r':(?P<nick>.*?)!~(?P<name>.*?)@(?P<host>.*?) '
@@ -113,8 +115,8 @@ class QllIrcClient(QllClient):
 		self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.irc.connect((server, port))
 		self.irc.setblocking(0)
-		self.command_call('NICK %s' % USERNAME)
-		self.command_call('USER %s %d %d :%s' % (USERNAME, 0, 0, REALNAME))
+		self.command_call('NICK %s' % registry.username)
+		self.command_call('USER %s %d %d :%s' % (registry.username, 0, 0, REALNAME))
 		self.connected_to_server()
 
 	def send_channel_message(self, channel, message, delay = False):
@@ -127,10 +129,10 @@ class QllIrcClient(QllClient):
 			self.command_call('PRIVMSG %s :%s' % (channel, line), delay)
 			if isinstance(channel, str) and channel.startswith('#'):
 				# channel message
-				events.call('send_channel_message', USERNAME, channel, line)
+				events.call('send_channel_message', registry.username, channel, line)
 			else:
 				# private message
-				events.call('send_private_message', USERNAME, channel, line)
+				events.call('send_private_message', registry.username, channel, line)
 	
 	def send_private_message(self, user, message, delay = False):
 		self.send_channel_message(user, message, delay)

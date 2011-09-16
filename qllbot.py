@@ -36,6 +36,7 @@ connection.row_factory = sqlite3.Row
 registry.db             = connection
 registry.eventsys       = eventsys
 registry.cmdinterpreter = cmdinterpreter
+registry.username       = USERNAME
 
 # get client
 if PROTOCOL == 'SILC':

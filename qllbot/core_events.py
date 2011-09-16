@@ -28,7 +28,7 @@ def log_private_message(sender, message):
 
 def welcome(user, channel):
 	''' Sends a welcome message to the channel. '''
-	if get_username(user) == USERNAME and GREETING != '':
+	if get_username(user) == registry.username and GREETING != '':
 		send_message(channel, GREETING)
 
 def log_join_channel(user, channel):
@@ -48,17 +48,28 @@ def get_op_from_userlist(channel, users):
 	''' Verifies if the bot has op status '''
 	op = False
 	for user in users:
-		if user == '@' + USERNAME:
+		if user == '@' + registry.username:
 			op = True
 	registry.channels[channel] = op
 
 def get_op_mode(user, channel, mode, who):
 	''' Reacts if the bot gets or looses op status in a channel '''
-	if USERNAME == who:
+	if registry.username == who:
 		if mode == '+o':
 			registry.channels[channel] = True
 		elif mode == '-o':
 			registry.channels[channel] = False
+
+def modify_nickname():
+	''' 
+		If a nickname is already in use, change the nickname to something else.
+		Here I use a simple algorithm to add a number at the end of the name.
+	'''
+	registry.client.log_event('Nickname already taken')
+	registry.username += '1'
+	registry.client.command_call('NICK %s' % registry.username)
+	registry.client.command_call('USER %s %d %d :%s' % (registry.username, 0, 0, REALNAME))
+	registry.client.connected_to_server()
 
 
 subscribe('ping', pong)
@@ -70,6 +81,7 @@ subscribe('leave', log_leave_channel)
 subscribe('invite', join_invited_channel)
 subscribe('users_response', get_op_from_userlist)
 subscribe('mode', get_op_mode)
+subscribe('nickname_in_use', modify_nickname)
 
 if GREETING != '':
 	subscribe('join', welcome)

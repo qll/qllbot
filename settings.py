@@ -3,9 +3,9 @@
 
 PROTOCOL = 'IRC'                       # SILC or IRC
 
-USERNAME = 'qllguy'                    # useraccount of the bot
-REALNAME = 'qllguy'                    # real name of the bot
-PASSWORD = '1337password1337'          # password of the bot useraccount
+USERNAME = 'qllbot'                    # useraccount of the bot
+REALNAME = 'qllbot'                    # real name of the bot
+PASSWORD = ''                          # password of the bot useraccount
 OWNER    = 'qll'                       # username of the bot admin
 
 SERVER           = 'irc.freenode.net'  # Server address
@@ -14,9 +14,10 @@ CHANNELS         = {                   # channels to connect to {'NAME': 'PASSWO
 	'#qllbottest': '',
 }
 
-SEND_KEEP_ALIVE  = False               # Default: False. Some network configurations
-                                       # require the bot to send data every 20 seconds.
+SEND_KEEP_ALIVE  = False               # Default: False. Some networks with with NAT
+                                       # require a socket to send data like every 20 seconds.
                                        # Use this, if you get "silent" disconnects.
+
 MODULES = (                            # loaded modules (can be found in ./modules)
 	'core',
 	'basic',
@@ -38,7 +39,7 @@ PUBKEY_PATH   = '%s/silc.pub' % CACHE  # public key file path (for SILC)
 PRIVKEY_PATH  = '%s/silc.prv' % CACHE  # private key file path (for SILC)
 DATABASE_PATH = '%s/db.sqlite' % CACHE # path to database (will be created if it does not exist)
 
-VERSION  = '0.6.1'
+VERSION  = '0.6.2'
 GREETING = 'qllbot v%s' % VERSION      # message sent when bot joins channel
 DEBUG    = False                       # print all socket messages to the console
 
