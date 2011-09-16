@@ -17,6 +17,10 @@ Feel free to email me if you need support.
 Note: If you just want to use the bot for IRC it will work out of the box! If
 you want to use the bot in your SILC channels, follow these instructions:  
   
+Warning: Due to recent changes SILC support won't work out of the box. I am working on
+restoring all features, but as I switched to IRC you might experience some problems due
+to a lack of testing with SILC.
+  
 First install the SILC Toolkit with development headers. If your distribution
 includes the needed packages, install them with your packet manager. Anyways
 - if you want the newest version of the toolkit or you can't get the toolkit

@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import sys, socket
-from re import match
+import socket, re
 from settings import *
 from qllbot.QllClient import QllClient
-from qllbot.IrcUser import IrcUser
-from qllbot.Registry import Registry
+from qllbot.IrcUser   import IrcUser
+from qllbot.Registry  import Registry
 
 
-# constants which should not be changed
+# IRC max message size (specified in RFC)
 MAX_MESSAGE_SIZE = 512
 
 
@@ -17,6 +16,9 @@ events = Registry().eventsys
 
 
 class QllIrcClient(QllClient):
+	''' Implements an IRC client from ground up with a nonblocking socket (currently). '''
+
+	# entries in following format: (event_name, sent_by_user?, regular_expression)
 	irc_regex = (
 		('channel_message', True,  r'PRIVMSG (?P<channel>#.+?) :(?P<message>.*)'),
 		('private_message', True,  r'PRIVMSG .+? :(?P<message>.*)'), 
@@ -41,11 +43,11 @@ class QllIrcClient(QllClient):
 		self.running()
 	
 	def found_terminator(self, response):
-		''' Interprets IRC commands. '''
+		''' Called when a \r\n was found. Checks for IRC commands. '''
 		for event, has_sender, regex in self.irc_regex:
 			if has_sender:
 				regex = self.regex_user + regex
-			result = match(regex, response)
+			result = re.match(regex, response)
 			if result:
 				parameters = []
 				startindex = 1
@@ -57,20 +59,19 @@ class QllIrcClient(QllClient):
 					parameters.append(result.group(i))
 				events.call(event, *parameters)
 				return
+		print(response)
 
 	def run_one(self):
 		''' Checks if the socket recieved some data '''
 		try:
 			self.buffer += self.irc.recv(512)
 		except socket.error:
-			pass
+			pass # this is expected behaviour with nonblocking sockets!
+
 		if self.buffer != '':
-			# debug
 			if DEBUG:
 				print(self.buffer)
-			
 			strings = self.buffer.split('\r\n')
-			
 			# buffer unfinished messages
 			if strings[len(strings) - 1] != '':
 				self.buffer = strings.pop()
@@ -85,7 +86,7 @@ class QllIrcClient(QllClient):
 				except UnicodeDecodeError:
 					print('Error: UnicodeDecodeError')
 
-		# done here, because we want to prevent flooding
+		# flooding prevention
 		self.iteration_counter += 1
 		if self.iteration_counter >= 5:
 			self.command_iteration()
