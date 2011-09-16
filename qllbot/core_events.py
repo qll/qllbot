@@ -9,6 +9,9 @@ registry = Registry()
 registry.channels = {}
 
 
+def pong(code):
+	registry.client.command_call('PONG ' + code)
+
 def interpret_message(sender, channel, message):
 	''' Checks for commands in all messages and prints out the returned string. '''
 	output = registry.cmdinterpreter.check(message, sender, channel)
@@ -58,6 +61,7 @@ def get_op_mode(user, channel, mode, who):
 			registry.channels[channel] = False
 
 
+subscribe('ping', pong)
 subscribe('channel_message', log_message)
 subscribe('private_message', log_private_message)
 subscribe('channel_message', interpret_message)

@@ -17,6 +17,19 @@ events = Registry().eventsys
 
 
 class QllIrcClient(QllClient):
+	irc_regex = (
+		('channel_message', True,  r'PRIVMSG (?P<channel>#.+?) :(?P<message>.*)'),
+		('private_message', True,  r'PRIVMSG .+? :(?P<message>.*)'), 
+		('join',            True,  r'JOIN (?P<channel>#.+)'),
+        ('leave',           True,  r'PART (?P<channel>#.+)'),
+		('invite',          True,  r'INVITE .+? :(?P<channel>#.+)'),
+		('mode',            True,  r'MODE (?P<channel>#.+) (?P<mode>.+?) (?P<user>.+?)'),
+		('kicked',          True,  r'KICK (?P<channel>#.+?) (?P<kicked>.+?) :(?P<message>.*)'),
+		('users_response',  False, r':.+? [\d]+ .+? [@=]{1} (?P<channel>#.+) :(?P<users>.+)'),
+		('ping',            False, r'PING (?P<pong>.*)')
+	)
+	regex_user = r':(?P<nick>.*?)!~(?P<name>.*?)@(?P<host>.*?) '
+
 	def __init__(self):
 		self.buffer = ''
 		self.irc    = None
@@ -29,62 +42,21 @@ class QllIrcClient(QllClient):
 	
 	def found_terminator(self, response):
 		''' Interprets IRC commands. '''
-		re_user = r':(?P<nick>.*?)!~(?P<name>.*?)@(?P<host>.*?) '
-
-		# channel message
-		regex = match(re_user + r'PRIVMSG (?P<channel>#.+?) :(?P<message>.*)', response)
-		if (regex):
-			sender = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
-			events.call('channel_message', sender, regex.group('channel'), regex.group('message'))
-			return
-		# private message
-		regex = match(re_user + r'PRIVMSG .+? :(?P<message>.*)', response)
-		if (regex):
-			sender = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
-			events.call('private_message', sender, regex.group('message'))
-			return
-		# user joined channel
-		regex = match(re_user + r'JOIN (?P<channel>#.+)', response)
-		if (regex):
-			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
-			events.call('join', user, regex.group('channel'))
-			return
-		# user left channel
-		regex = match(re_user + r'PART (?P<channel>#.+)', response)
-		if (regex):
-			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
-			events.call('leave', user, regex.group('channel'))
-			return
-		# PING
-		regex = match(r'PING (?P<pong>.*)', response)
-		if (regex):
-			self.command_call('PONG ' + regex.group('pong'))
-			return
-		# channel invite
-		regex = match(re_user + r'INVITE .+? :(?P<channel>#.+)', response)
-		if (regex):
-			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
-			events.call('invite', user, regex.group('channel'))
-			return
-		# mode command
-		regex = match(re_user + r'MODE (?P<channel>#.+) (?P<mode>.+?) (?P<user>.+?)', response)
-		if (regex):
-			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
-			events.call('mode', user, regex.group('channel'), regex.group('mode'), regex.group('user'))
-			return
-		# users command (issued when joining a channel)
-		regex = match(r':.+? [\d]+ .+? [@=]{1} (?P<channel>#.+) :(?P<users>.+)', response)
-		if (regex):
-			events.call('users_response', regex.group('channel'), regex.group('users').split(' '))
-			return
-		# kicked from channel
-		regex = match(re_user + r'KICK (?P<channel>#.+?) (?P<kicked>.+?) :(?P<message>.*)', response)
-		if (regex):
-			user = self.create_IrcUser(regex.group('nick'), regex.group('name'), regex.group('host'))
-			events.call('kicked', user, regex.group('channel'), regex.group('kicked'), regex.group('message'))
-			return
-		# unknown message
-		#print(response)
+		for event, has_sender, regex in self.irc_regex:
+			if has_sender:
+				regex = self.regex_user + regex
+			result = match(regex, response)
+			if result:
+				parameters = []
+				startindex = 1
+				if has_sender:
+					sender = self.create_IrcUser(result.group('nick'), result.group('name'), result.group('host'))
+					parameters.append(sender)
+					startindex = 4
+				for i in range(startindex, len(result.groups()) + 1):
+					parameters.append(result.group(i))
+				events.call(event, *parameters)
+				return
 
 	def run_one(self):
 		''' Checks if the socket recieved some data '''
@@ -154,10 +126,10 @@ class QllIrcClient(QllClient):
 			self.command_call('PRIVMSG %s :%s' % (channel, line), delay)
 			if isinstance(channel, str) and channel.startswith('#'):
 				# channel message
-				self.notify_send_channel_message(channel, line)
+				events.call('send_channel_message', USERNAME, channel, line)
 			else:
 				# private message
-				self.notify_send_private_message(channel, line)
+				events.call('send_private_message', USERNAME, channel, line)
 	
 	def send_private_message(self, user, message, delay = False):
 		self.send_channel_message(user, message, delay)
