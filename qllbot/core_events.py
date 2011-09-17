@@ -46,6 +46,8 @@ def remove_from_userlist(user, channel):
 def check_for_op(user, channel, mode, who):
 	if mode.find('+o') != -1:
 		registry.channels[channel].op(who)
+		if AUTO_OP_OWNER and who == registry.username and not registry.channels[channel].is_op(OWNER):
+			registry.client.command_call('MODE %s +o %s' % (channel, OWNER))
 	elif mode.find('-o') != -1:
 		registry.channels[channel].deop(who)
 
@@ -77,6 +79,11 @@ def welcome(user, channel):
 	if get_username(user) == registry.username and GREETING != '':
 		send_message(channel, GREETING)
 
+def op_owner(user, channel):
+	''' Automatically gives a joining owner the +o mode if the bot has sufficient rights. '''
+	if get_username(user) == OWNER and registry.channels[channel].is_op(registry.username):
+			registry.client.command_call('MODE %s +o %s' % (channel, OWNER))
+
 
 subscribe('ping', pong)
 
@@ -94,5 +101,7 @@ subscribe('channel_message', interpret_message)
 subscribe('invite',          join_invited_channel)
 subscribe('nickname_in_use', modify_nickname)
 
+if AUTO_OP_OWNER:
+	subscribe('join', op_owner)
 if GREETING != '':
 	subscribe('join', welcome)
