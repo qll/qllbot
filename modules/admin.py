@@ -18,8 +18,8 @@ def quit(param):
 		return u'You are not allowed to shut me down D:<'
 
 def op_owner(user, channel):
-	''' Automatically gives a joining owner the +o mode if the bot has it. '''
-	if get_username(user) == OWNER and registry.channels[channel]:
+	''' Automatically gives a joining owner the +o mode if the bot has sufficient rights. '''
+	if get_username(user) == OWNER and registry.channels[channel].is_op(registry.username):
 			registry.client.command_call('MODE %s +o %s' % (channel, OWNER))
 
 
