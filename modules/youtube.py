@@ -4,8 +4,10 @@ import urllib2, re
 from xml.etree.ElementTree import ElementTree
 from xml.parsers.expat import *
 from qllbot.Registry import *
-from qllbot.static_vars import *
 from qllbot.basic_functions import send_message
+
+
+ATOM = 'http://www.w3.org/2005/Atom'
 
 
 def display_youtube_video_title(sender, channel, message):
