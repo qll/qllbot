@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import re
-import urllib2
+import re, urllib2
 from Registry import Registry
 from settings import *
 
@@ -30,12 +29,10 @@ def get_channelname(obj):
 def send_message(channel, message, delay = False):
 	''' Sends a message to a channel. '''
 	registry.client.send_channel_message(channel, message, delay)
-	registry.client.log_message(USERNAME, message, channel)
 
 def send_private_message(user, message, delay = False):
 	''' Sends a message to an user. '''
 	registry.client.send_private_message(user, message, delay)
-	registry.client.log_message(USERNAME, message, user)
 
 def is_op(channel):
 	''' Checks if the bot is op in that channel '''
@@ -45,6 +42,5 @@ def is_op(channel):
 
 def shorten_url(url):
 	''' Shortens an URL. Currently uses tinyurl.com. '''
-	handle = urllib2.urlopen('http://tinyurl.com/api-create.php?url=%s' % url)
-	return handle.read()
+	return urllib2.urlopen('http://tinyurl.com/api-create.php?url=%s' % url).read()
 

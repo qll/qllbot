@@ -16,16 +16,16 @@ def pong(code):
 
 
 def log_message(sender, channel, message):
-	registry.client.log_message(sender, message, channel)
+	registry.logger.log_message(sender, message, channel)
 
 def log_private_message(sender, message):
 	log_message(sender, '@PM', message)
 
 def log_join_channel(user, channel):
-	registry.client.log_event('User named %s joined channel %s' % (user, channel))
+	registry.logger.log_event('User named %s joined channel %s' % (user, channel))
 
 def log_leave_channel(user, channel):
-	registry.client.log_event('User named %s left channel %s' % (user, channel))
+	registry.logger.log_event('User named %s left channel %s' % (user, channel))
 
 
 def parse_userlist(channel, users):
@@ -68,7 +68,7 @@ def modify_nickname():
 		If a nickname is already in use, change the nickname to something else.
 		Here I use a simple algorithm to add a number at the end of the name.
 	'''
-	registry.client.log_event('Nickname already taken')
+	registry.logger.log_event('Nickname already taken')
 	registry.username += '1'
 	registry.client.command_call('NICK %s' % registry.username)
 	registry.client.command_call('USER %s %d %d :%s' % (registry.username, 0, 0, REALNAME))
@@ -87,10 +87,12 @@ def op_owner(user, channel):
 
 subscribe('ping', pong)
 
-subscribe('channel_message', log_message)
-subscribe('private_message', log_private_message)
-subscribe('join',            log_join_channel)
-subscribe('leave',           log_leave_channel)
+subscribe('channel_message',      log_message)
+subscribe('private_message',      log_private_message)
+subscribe('send_channel_message', log_message)
+subscribe('send_private_message', log_message)
+subscribe('join',                 log_join_channel)
+subscribe('leave',                log_leave_channel)
 
 subscribe('users_response',  parse_userlist)
 subscribe('join',            add_to_userlist)

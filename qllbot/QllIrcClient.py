@@ -61,7 +61,6 @@ class QllIrcClient(QllClient):
 					parameters.append(result.group(i))
 				events.call(event, *parameters)
 				return
-		print(response)
 
 	def run_one(self):
 		''' Checks if the socket recieved some data '''
@@ -119,20 +118,23 @@ class QllIrcClient(QllClient):
 		self.command_call('USER %s %d %d :%s' % (registry.username, 0, 0, REALNAME))
 		self.connected_to_server()
 
+	def send_channel_message_event(self, channel, username, message):
+		event = 'send_private_message'
+		if channel.startswith('#'):
+			event = 'send_channel_message'
+		events.call(event, username, channel, message)
+
 	def send_channel_message(self, channel, message, delay = False):
 		''' Sends a message to a channel '''
 		for line in message.split('\n'):
 			# max message length of IRC = 512 (with \r\n)
 			if len(line) > (MAX_MESSAGE_SIZE - 2):
 				self.command_call('PRIVMSG %s :%s' % (channel, line[:(MAX_MESSAGE_SIZE - 2)]), delay)
+				self.send_channel_message_event(channel, registry.username, line)
 				self.send_channel_message(line[(MAX_MESSAGE_SIZE - 1):])
-			self.command_call('PRIVMSG %s :%s' % (channel, line), delay)
-			if isinstance(channel, str) and channel.startswith('#'):
-				# channel message
-				events.call('send_channel_message', registry.username, channel, line)
 			else:
-				# private message
-				events.call('send_private_message', registry.username, channel, line)
+				self.command_call('PRIVMSG %s :%s' % (channel, line), delay)
+				self.send_channel_message_event(channel, registry.username, line)
 	
 	def send_private_message(self, user, message, delay = False):
 		self.send_channel_message(user, message, delay)

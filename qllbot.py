@@ -38,6 +38,10 @@ registry.eventsys       = eventsys
 registry.cmdinterpreter = cmdinterpreter
 registry.username       = USERNAME
 
+# create logger
+logtmp = __import__('qllbot.' + LOGGER, fromlist = [LOGGER])
+registry.logger = getattr(logtmp, LOGGER)()
+
 # get client
 if PROTOCOL == 'SILC':
 	import silc
