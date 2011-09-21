@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import time
-from settings import *
+from time import time, localtime
 from copy import deepcopy
+from settings import *
 from qllbot.Registry import *
 from qllbot.basic_functions import get_username, get_channelname, send_private_message
 
@@ -20,7 +20,7 @@ def create_seen_tables():
 
 def seen_joined_channel(channel, users):
 	''' Gets USER command replys and checks for new users '''
-	for user in users:
+	for user in users.split(' '):
 		add_to_seen(user, channel)
 
 def seen_write_changes():
@@ -32,28 +32,23 @@ def seen_write_changes():
 
 def add_to_seen(user, channel):
 	''' Adds a user to the global seen dictionary '''
-	user    = get_username(user)
-	channel = get_channelname(channel)
+	user = get_username(user)
 	
 	# remove op status from nicknames
 	if user.startswith('@'):
 		user = user[1:]
 	
-	# store into dictionary
-	if not user in registry.history_seen:
-		registry.history_seen[user] = {channel: time.time()}
+	if not user in registry.history_seen.keys():
+		registry.history_seen[user] = {channel: time()}
 	else:
 		if not channel in registry.history_seen[user].keys():
-			registry.history_seen[user][channel] = time.time()
+			registry.history_seen[user][channel] = time()
 
 def remove_from_seen(user, channel):
 	''' Removes an user from registry.history_seen and writes him/her to the database. '''
-	# todo: write leave event for irc
-	user    = get_username(user)
-	channel = get_channelname(channel)
+	user = get_username(user)
 	
-	# the bot should not write itsself into the database
-	if user != USERNAME and user in registry.history_seen.keys():
+	if user != registry.username and user in registry.history_seen.keys():
 		if not channel in registry.history_seen[user].keys():
 			# something went wrong :O
 			return
@@ -66,11 +61,11 @@ def remove_from_seen(user, channel):
 		c = registry.db.cursor()
 		c.execute('SELECT time FROM seen WHERE user = ?', (user,))
 		if c.fetchone() == None:
-			c.execute('INSERT INTO seen VALUES (?, ?, ?)', (user, channel, time.time()))
+			c.execute('INSERT INTO seen VALUES (?, ?, ?)', (user, channel, time()))
 		else:
 			c.execute(
 				'UPDATE seen SET channel = ?, time = ? WHERE user = ?',
-				(channel, time.time(), user)
+				(channel, time(), user)
 			)
 		registry.history_seen.pop(user)
 
@@ -86,7 +81,7 @@ def seen(param):
 	c.execute('SELECT time, channel FROM seen WHERE user = ?', (param,))
 	row = c.fetchone()
 	if row != None:
-		diff = time.time() - row[0]
+		diff = time() - row[0]
 		if diff <= 3600:
 			minutes = round(diff / 60)
 			if minutes == 0:
@@ -96,73 +91,16 @@ def seen(param):
 			else:
 				ftime = '%d minutes ago' % (minutes)
 		else:
-			ftime  = time.strftime('%H:%M on %d.%m.%Y', time.localtime(row[0]))
+			ftime  = time.strftime('%H:%M on %d.%m.%Y', localtime(row[0]))
 		return 'I have seen %s %s in %s.' % (param, ftime, row[1])
 	else:
 		return 'I have never seen this nickname.'
 
-def create_history_tables():
-	registry.db.execute('CREATE TABLE history (user TEXT, channel TEXT, time INTEGER, message TEXT, event INTEGER)')
 
-def add_history_message(sender, channel, message):
-	registry.db.execute(
-		'INSERT INTO history VALUES (?, ?, ?, ?, 0)',
-		(get_username(sender), get_channelname(channel), time.time(), message)
-	)
-
-def add_history_event(user, channel, message):
-	registry.db.execute(
-		'INSERT INTO history VALUES (?, ?, ?, ?, 1)',
-		(get_username(user), get_channelname(channel), time.time(), message)
-	)
-
-def add_history_event_join(user, channel):
-	add_history_event(user, channel, 'joined the channel')
-
-def add_history_event_leave(user, channel):
-	add_history_event(user, channel, 'left the channel')
-
-def get_history(param):
-	''' Sends a private message to you with all messages written while you were offline. '''
-	user    = get_username(registry.cmdinterpreter.current_sender)
-	channel = get_channelname(registry.cmdinterpreter.current_channel)
-
-	c = registry.db.cursor()
-	c.execute(
-		'SELECT time FROM seen WHERE user = ? AND channel = ?',
-		(user, channel)
-	)
-	
-	tfrom = c.fetchone()
-	if tfrom != None:
-		tfrom = tfrom[0]
-		c.execute(
-			'SELECT * FROM history WHERE time > ? AND time < ? ORDER BY time ASC',
-			(tfrom, registry.history_seen[user][channel])
-		)
-		result = ''
-		for row in c:
-			ftime  = time.strftime('%H:%M:%S', time.localtime(row[2]))
-			if row[4] != 1:
-				# normal message
-				result += '(%s) %s: %s\n' % (ftime, row[0], row[3])
-			else:
-				# event
-				result += '* (%s) %s %s\n' % (ftime, row[0], row[3])
-		send_private_message(registry.cmdinterpreter.current_sender, result[:-1], True)
-
-
-subscribe('create_tables', create_seen_tables)
+subscribe('create_tables',  create_seen_tables)
 subscribe('users_response', seen_joined_channel)
-subscribe('pre_exit', seen_write_changes)
-subscribe('join', add_to_seen)
-subscribe('leave', remove_from_seen)
-add_command('seen', seen)
+subscribe('pre_exit',       seen_write_changes)
+subscribe('join',           add_to_seen)
+subscribe('leave',          remove_from_seen)
 
-# buggy stuff :C
-#subscribe('create_tables', create_history_tables)
-#subscribe('channel_message', add_history_message)
-#subscribe('send_channel_message', add_history_message)
-#subscribe('join', add_history_event_join)
-#subscribe('leave', add_history_event_leave)
-#add_command('history', get_history)
+add_command('seen', seen)
