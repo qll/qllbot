@@ -25,6 +25,6 @@ def get_help(param):
 	return 'Command not found.'
 
 
-add_command('version', get_version)
+add_command('version',  get_version)
 add_command('commands', get_loaded_commands)
-add_command('help', get_help)
+add_command('help',     get_help)
