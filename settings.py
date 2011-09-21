@@ -33,11 +33,14 @@ MODULES = (                            # loaded modules (can be found in ./modul
 
 COMMAND_TOKEN = '#'                    # marks a command (default: #)
 
-LOGGER = 'ConsoleLogger'               # Currently you have following choices of Loggers:
-                                       # DummyLogger, ConsoleLogger, FileLogger, DbLogger
+LOGGER = 'DbLogger'               # Currently you have following choices of Loggers:
+                                       # DummyLogger, ConsoleLogger, DbLogger
+DB_LOGGER_CONSOLE  = True              # if you use DbLogger this enables console output, too
 
+LOG_TIME_FORMAT    = '%H:%M:%S'
 LOG_MESSAGE_FORMAT = '[%(channel)s %(time)s] %(username)s: %(message)s'
 LOG_EVENT_FORMAT   = '* [%(time)s] %(event)s'
+
 
 CACHE         = 'cache'                # cache directory
 PUBKEY_PATH   = '%s/silc.pub' % CACHE  # public key file path (for SILC)
