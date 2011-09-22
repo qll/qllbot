@@ -48,13 +48,13 @@ def remove_from_seen(user, channel):
 	''' Removes an user from registry.history_seen and writes him/her to the database. '''
 	user = get_username(user)
 	
-	if user != registry.username and user in registry.history_seen.keys():
+	if user in registry.history_seen.keys():
 		if not channel in registry.history_seen[user].keys():
 			# something went wrong :O
 			return
 		
 		registry.history_seen[user].pop(channel)
-		if len(registry.history_seen[user]) != 0:
+		if len(registry.history_seen[user]) != 0 or user == registry.username:
 			# user just left one channel the bot resides in
 			return
 		
@@ -68,6 +68,9 @@ def remove_from_seen(user, channel):
 				(channel, time(), user)
 			)
 		registry.history_seen.pop(user)
+
+def kicked_from_seen(user, channel, kicker, message):
+	remove_from_seen(user, channel)
 
 def seen(param):
 	''' Returns the last time a user was seen online (by this bot). '''
@@ -102,5 +105,6 @@ subscribe('users_response', seen_joined_channel)
 subscribe('pre_exit',       seen_write_changes)
 subscribe('join',           add_to_seen)
 subscribe('leave',          remove_from_seen)
+subscribe('kicked',         kicked_from_seen)
 
 add_command('seen', seen)

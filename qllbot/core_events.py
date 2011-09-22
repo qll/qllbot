@@ -41,7 +41,14 @@ def add_to_userlist(user, channel):
 
 def remove_from_userlist(user, channel):
 	if channel in registry.channels.keys():
-		registry.channels[channel].remove_user(get_username(user))
+		if get_username(user) == registry.username:
+			# bot left channel
+			registry.channels.pop(channel)
+		else:
+			registry.channels[channel].remove_user(get_username(user))
+
+def kicked_from_userlist(user, channel, kicked, message):
+	remove_from_userlist(user, channel)
 
 def check_for_op(user, channel, mode, who):
 	if mode.find('+o') != -1:
@@ -97,6 +104,7 @@ subscribe('leave',                log_leave_channel)
 subscribe('users_response',  parse_userlist)
 subscribe('join',            add_to_userlist)
 subscribe('leave',           remove_from_userlist)
+subscribe('kicked',          kicked_from_userlist)
 subscribe('mode',            check_for_op)
 
 subscribe('channel_message', interpret_message)
