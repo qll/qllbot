@@ -27,6 +27,9 @@ def log_join_channel(user, channel):
 def log_leave_channel(user, channel):
 	registry.logger.log_event('User named %s left channel %s' % (user, channel))
 
+def log_kicked(user, channel, kicked, message):
+	registry.logger.log_event('User named %s kicked %s from %s (%s)' % (user, kicked, channel, message))
+
 
 def parse_userlist(channel, users):
 	''' Parses the whole userlist and saves the channel to registry.channels. '''
@@ -100,6 +103,7 @@ subscribe('send_channel_message', log_message)
 subscribe('send_private_message', log_message)
 subscribe('join',                 log_join_channel)
 subscribe('leave',                log_leave_channel)
+subscribe('kicked',               log_kicked)
 
 subscribe('users_response',  parse_userlist)
 subscribe('join',            add_to_userlist)
