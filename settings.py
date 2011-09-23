@@ -32,6 +32,14 @@ MODULES = (                            # loaded modules (can be found in ./modul
 )
 
 COMMAND_TOKEN = '#'                    # marks a command (default: #)
+VERSION  = '0.6.7'
+GREETING = 'qllbot v%s' % VERSION      # message sent when bot joins channel
+DEBUG    = False                       # print all socket messages to the console
+
+CACHE         = 'cache'                # cache directory
+PUBKEY_PATH   = '%s/silc.pub' % CACHE  # public key file path (for SILC)
+PRIVKEY_PATH  = '%s/silc.prv' % CACHE  # private key file path (for SILC)
+DATABASE_PATH = '%s/db.sqlite' % CACHE # path to database (will be created if it does not exist)
 
 LOGGER = 'ConsoleLogger'               # Currently you have following choices of Loggers:
                                        # DummyLogger, ConsoleLogger, DbLogger
@@ -41,15 +49,9 @@ LOG_TIME_FORMAT    = '%H:%M:%S'
 LOG_MESSAGE_FORMAT = '[%(channel)s %(time)s] %(username)s: %(message)s'
 LOG_EVENT_FORMAT   = '* [%(time)s] %(event)s'
 
-
-CACHE         = 'cache'                # cache directory
-PUBKEY_PATH   = '%s/silc.pub' % CACHE  # public key file path (for SILC)
-PRIVKEY_PATH  = '%s/silc.prv' % CACHE  # private key file path (for SILC)
-DATABASE_PATH = '%s/db.sqlite' % CACHE # path to database (will be created if it does not exist)
-
-VERSION  = '0.6.6'
-GREETING = 'qllbot v%s' % VERSION      # message sent when bot joins channel
-DEBUG    = False                       # print all socket messages to the console
+PRINT_EXCEPTIONS = True                # print Exceptions to console
+CRASH_LOG_PATH   = ''                  # where to write crash logs (crash.[number].log)
+                                       # leave empty if you don't want crashlogs to be created
 
 ### MODULES ###
 # internet
