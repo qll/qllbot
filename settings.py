@@ -32,7 +32,7 @@ MODULES = (                            # loaded modules (can be found in ./modul
 )
 
 COMMAND_TOKEN = '#'                    # marks a command (default: #)
-VERSION  = '0.6.7'
+VERSION  = '0.6.8'
 GREETING = 'qllbot v%s' % VERSION      # message sent when bot joins channel
 DEBUG    = False                       # print all socket messages to the console
 

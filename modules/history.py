@@ -72,6 +72,11 @@ def remove_from_seen(user, channel):
 def kicked_from_seen(user, channel, kicker, message):
 	remove_from_seen(user, channel)
 
+def left_server(user, message):
+	iterator = deepcopy(registry.history_seen)
+	for channel, timestamp in iterator[get_username(user)].iteritems():
+		remove_from_seen(user, channel)
+
 def seen(param):
 	''' Returns the last time a user was seen online (by this bot). '''
 	if param == '':
@@ -106,5 +111,6 @@ subscribe('pre_exit',       seen_write_changes)
 subscribe('join',           add_to_seen)
 subscribe('leave',          remove_from_seen)
 subscribe('kicked',         kicked_from_seen)
+subscribe('quit',           left_server)
 
 add_command('seen', seen)

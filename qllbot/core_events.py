@@ -27,6 +27,9 @@ def log_join_channel(user, channel):
 def log_leave_channel(user, channel):
 	registry.logger.log_event('User named %s left channel %s' % (user, channel))
 
+def log_client_quit(user, message):
+	registry.logger.log_event('%s left the server (%s)' % (user, message))
+
 def log_kicked(user, channel, kicked, message):
 	registry.logger.log_event('User named %s kicked %s from %s (%s)' % (user, kicked, channel, message))
 
@@ -57,6 +60,10 @@ def remove_from_userlist(user, channel):
 		registry.channels.pop(channel)
 	else:
 		registry.channels[channel].remove_user(get_username(user))
+
+def remove_client_quit(user, message):
+	for name, channel in registry.channels.iteritems():
+		channel.remove_user(get_username(user))
 
 def kicked_from_userlist(user, channel, kicked, message):
 	remove_from_userlist(user, channel)
@@ -114,6 +121,7 @@ subscribe('send_private_message', log_message)
 subscribe('private_message',      log_private_message)
 subscribe('join',                 log_join_channel)
 subscribe('leave',                log_leave_channel)
+subscribe('quit' ,                log_client_quit)
 subscribe('kicked',               log_kicked)
 subscribe('topic',                log_topic)
 
@@ -122,6 +130,7 @@ subscribe('join_users',      parse_userlist)
 subscribe('join_topic',      parse_topic)
 subscribe('leave',           remove_from_userlist)
 subscribe('kicked',          kicked_from_userlist)
+subscribe('quit',            remove_client_quit)
 subscribe('mode',            check_for_op)
 subscribe('topic',           change_topic)
 

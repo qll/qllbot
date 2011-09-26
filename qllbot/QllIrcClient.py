@@ -24,6 +24,7 @@ class QllIrcClient(QllClient):
 		('private_message', True,  r'PRIVMSG .+? :(?P<message>.*)'), 
 		('join',            True,  r'JOIN :{0,1}(?P<channel>#.+)'),
 		('leave',           True,  r'PART :{0,1}(?P<channel>#.+)'),
+		('quit',            True,  r'QUIT :(?P<message>.*)'),
 		('invite',          True,  r'INVITE .+? :(?P<channel>#.+)'),
 		('mode',            True,  r'MODE (?P<channel>#.+?) (?P<mode>.+?) (?P<user>.+)'),
 		('topic',           True,  r'TOPIC (?P<channel>#.+?) :(?P<topic>.*)'),
@@ -100,14 +101,20 @@ class QllIrcClient(QllClient):
 		if isinstance(command, unicode):
 			command = command.encode('utf-8')
 		if not delay:
-			self.irc.send('%s\r\n' % command)
+			try:
+				self.irc.send('%s\r\n' % command)
+			except socket.error:
+				self.disconnected()
 		else:
 			self.commands.append(command)
 	
 	def command_iteration(self):
 		if len(self.commands) > 0:
 			command = self.commands.pop(0)
-			self.irc.send('%s\r\n' % command)
+			try:
+				self.irc.send('%s\r\n' % command)
+			except socket.error:
+				self.disconnected()
 
 	def connect_to_server(self, server, port = 6667):
 		''' Connects to a IRC Server '''

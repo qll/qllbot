@@ -24,6 +24,7 @@ class QllClient():
 
 	def disconnected(self, msg):
 		registry.logger.log_event('Disconnected: %s' % msg)
+		registry.eventsys.call('disconnect')
 		registry.logger.log_event('Attempting reconnect')
 		self.connect_to_server(SERVER)
 	
