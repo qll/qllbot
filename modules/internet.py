@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import urllib2, re
+import re
+from urllib2 import Request, HTTPError, quote, urlopen, build_opener
 from xml.etree.ElementTree import ElementTree
 from qllbot.basic_functions import strip_tags
 from qllbot.Registry import *
@@ -11,14 +12,18 @@ def google(param):
 	''' Starts a google search for a given string (e.g. #google test -> results for 'test') '''
 	if param == '':
 		return u'No search string submitted.'
-	param   = urllib2.quote(param.encode('utf8', 'replace'))
-	request = urllib2.Request('http://www.google.de/search?hl=de&q=%s&btnG=Suche' % param)
-	# Google does not like strange user agents :-)
-	request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.696.3 Safari/534.24') 
-	opener  = urllib2.build_opener()
-	content = opener.open(request).read().decode('utf-8')
+	content = ''
+	try:
+		param   = quote(param.encode('utf8', 'replace'))
+		request = Request('http://www.google.de/search?hl=de&q=%s&btnG=Suche' % param)
+		# Google does not like strange user agents :-)
+		request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.696.3 Safari/534.24') 
+		content = build_opener().open(request).read().decode('utf-8', 'replace')
+	except HTTPError as error:
+		return u'%s' % error
 
-	regex  = r'<li class=(g|w0)( style=[^>]+)??><div[^>]+><span[^>]+><h3 class="r"><a href="(?P<url>[^>]+)" class=l[^>]+>(?P<page_title>.*?)</a>'
+	#print(content.encode('utf-8', 'replace'))
+	regex  = r'<li class=(g|w0)[^>]*><div[^>]+><h3[^>]+><a href="(?P<url>[^>]+)" class=l[^>]+>(?P<page_title>.+?)</a>'
 	output = 'No match.'
 	i      = 0
 	for result in re.finditer(regex, content):
@@ -41,10 +46,10 @@ def get_weather(param):
 			return 'Invalid location. Use city name or postal code.'
 		location = param
 	try:
-		location = urllib2.quote(location.encode('utf8', 'replace'))
-		handle   = urllib2.urlopen('http://www.google.com/ig/api?weather=%s' % location)
-	except:
-		return 'Error opening URL.'
+		location = quote(location.encode('utf8', 'replace'))
+		handle   = urlopen('http://www.google.com/ig/api?weather=%s' % location)
+	except HTTPError as error:
+		return u'%s' % error
 	tree = ElementTree()
 	tree.parse(handle)
 	handle.close()
@@ -80,9 +85,10 @@ def get_weather(param):
 
 def get_random_imdb(param):
 	''' Returns random movie from imdb.com '''
-	handle = urllib2.urlopen('http://www.imdb.com/random/title')
-	content = handle.read().decode('utf-8')
-	handle.close()
+	try:
+		content = urlopen('http://www.imdb.com/random/title').read().decode('utf-8')
+	except HTTPError as error:
+		return u'%s' % error
 
 	seriesMatch = re.search(r'<meta name="title" content=".+ \(TV Series', content)
 	if seriesMatch != None:
@@ -111,3 +117,4 @@ add_command('google', google)
 add_command('weather', get_weather)
 add_command('randommovie', get_random_imdb)
 add_command('givemovie', get_random_imdb)
+
