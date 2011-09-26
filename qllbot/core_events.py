@@ -22,16 +22,16 @@ def log_private_message(sender, message):
 	log_message(sender, '@PM', message)
 
 def log_join_channel(user, channel):
-	registry.logger.log_event('User named %s joined channel %s' % (user, channel))
+	registry.logger.log_event('%s joined channel %s' % (user, channel))
 
 def log_leave_channel(user, channel):
-	registry.logger.log_event('User named %s left channel %s' % (user, channel))
+	registry.logger.log_event('%s left channel %s' % (user, channel))
 
 def log_client_quit(user, message):
 	registry.logger.log_event('%s left the server (%s)' % (user, message))
 
 def log_kicked(user, channel, kicked, message):
-	registry.logger.log_event('User named %s kicked %s from %s (%s)' % (user, kicked, channel, message))
+	registry.logger.log_event('%s kicked %s from %s (%s)' % (user, kicked, channel, message))
 
 def log_topic(user, channel, topic):
 	registry.logger.log_event("%s changed topic to '%s' in %s" % (user, topic, channel))
