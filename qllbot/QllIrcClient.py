@@ -28,7 +28,8 @@ class QllIrcClient(QllClient):
 		('mode',            True,  r'MODE (?P<channel>#.+?) (?P<mode>.+?) (?P<user>.+)'),
 		('topic',           True,  r'TOPIC (?P<channel>#.+?) :(?P<topic>.*)'),
 		('kicked',          True,  r'KICK (?P<channel>#.+?) (?P<kicked>.+?) :(?P<message>.*)'),
-		('users_response',  False, r':.+? [\d]+ .+? [@=]{1} (?P<channel>#.+) :(?P<users>.+)'),
+		('join_users',      False, r':.+? [\d]+ .+? [@=]{1} (?P<channel>#.+?) :(?P<users>.+)'),
+		('join_topic',      False, r':.+? [\d]+ .+? (?P<channel>#.+?) :(?P<topic>(?!End of /NAMES list\.).*)'),
 		# internally used events
 		('nickname_in_use', False, r':.+? [\d]+ \* .+? :Nickname is already in use\.'),
 		('ping',            False, r'PING (?P<pong>.*)')

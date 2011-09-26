@@ -101,7 +101,7 @@ def seen(param):
 
 
 subscribe('create_tables',  create_seen_tables)
-subscribe('users_response', seen_joined_channel)
+subscribe('join_users',     seen_joined_channel)
 subscribe('pre_exit',       seen_write_changes)
 subscribe('join',           add_to_seen)
 subscribe('leave',          remove_from_seen)

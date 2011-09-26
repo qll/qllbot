@@ -31,27 +31,32 @@ def log_kicked(user, channel, kicked, message):
 	registry.logger.log_event('User named %s kicked %s from %s (%s)' % (user, kicked, channel, message))
 
 def log_topic(user, channel, topic):
-	registry.logger.log_event('%s changed topic to %s in %s' % (user, topic, channel))
+	registry.logger.log_event("%s changed topic to '%s' in %s" % (user, topic, channel))
 
 
-def parse_userlist(channel, users):
-	''' Parses the whole userlist and saves the channel to registry.channels. '''
+def create_channel(channel):
 	if not channel in registry.channels.keys():
 		registry.channels[channel] = Channel(channel)
+	
+def parse_userlist(channel, users):
+	create_channel(channel)
 	for user in users.split(' '):
 		registry.channels[channel].add_user(user)
 
+def parse_topic(channel, topic):
+	create_channel(channel)
+	registry.channels[channel].topic = topic
+
 def add_to_userlist(user, channel):
-	if channel in registry.channels.keys():
-		registry.channels[channel].add_user(get_username(user))
+	create_channel(channel)
+	registry.channels[channel].add_user(get_username(user))
 
 def remove_from_userlist(user, channel):
-	if channel in registry.channels.keys():
-		if get_username(user) == registry.username:
-			# bot left channel
-			registry.channels.pop(channel)
-		else:
-			registry.channels[channel].remove_user(get_username(user))
+	if get_username(user) == registry.username:
+		# bot left channel
+		registry.channels.pop(channel)
+	else:
+		registry.channels[channel].remove_user(get_username(user))
 
 def kicked_from_userlist(user, channel, kicked, message):
 	remove_from_userlist(user, channel)
@@ -63,6 +68,9 @@ def check_for_op(user, channel, mode, who):
 			registry.client.command_call('MODE %s +o %s' % (channel, OWNER))
 	elif mode.find('-o') != -1:
 		registry.channels[channel].deop(who)
+
+def change_topic(user, channel, topic):
+	registry.channels[channel].topic = topic
 
 
 def interpret_message(sender, channel, message):
@@ -109,11 +117,13 @@ subscribe('leave',                log_leave_channel)
 subscribe('kicked',               log_kicked)
 subscribe('topic',                log_topic)
 
-subscribe('users_response',  parse_userlist)
 subscribe('join',            add_to_userlist)
+subscribe('join_users',      parse_userlist)
+subscribe('join_topic',      parse_topic)
 subscribe('leave',           remove_from_userlist)
 subscribe('kicked',          kicked_from_userlist)
 subscribe('mode',            check_for_op)
+subscribe('topic',           change_topic)
 
 subscribe('channel_message', interpret_message)
 subscribe('invite',          join_invited_channel)

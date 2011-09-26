@@ -6,6 +6,8 @@ class Channel():
 
 	mode = ''
 
+	topic = ''
+
 	# contains following info: {'username': True/False (is op), ...}
 	users = {}
 
