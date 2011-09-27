@@ -37,4 +37,13 @@ class Channel():
 		self.users[username] = False
 	
 	def is_op(self, username):
-		return self.users[username]
+		if self.exists(username):
+			return self.users[username]
+		else:
+			return False
+	
+	def exists(self, username):
+		if username in self.users.keys():
+			return True
+		else:
+			return False

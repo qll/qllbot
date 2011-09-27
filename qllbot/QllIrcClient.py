@@ -147,6 +147,10 @@ class QllIrcClient(QllClient):
 	
 	def send_private_message(self, user, message, delay = False):
 		self.send_channel_message(user, message, delay)
+	
+	def set_topic(self, channel, topic):
+		if registry.channels[channel].is_op(registry.username):
+			self.command_call('TOPIC %s :%s' % (channel, topic))
 
 	def create_IrcUser(self, nickname, realname, host):
 		user = IrcUser()

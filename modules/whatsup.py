@@ -17,9 +17,11 @@ def set_whatsup(param):
 		result = c.fetchone()
 		if result != None and result[1] != 0:
 			db.execute('UPDATE whatsup SET active = 0 WHERE id = ?', (result[0],))
+			registry.client.set_topic(registry.cmdinterpreter.current_channel, '')
 		return u'Nothing going on...'
 	else:
 		db.execute('INSERT INTO whatsup(channel, action, active) VALUES (?, ?, ?)', (registry.cmdinterpreter.current_channel, param, 1))
+		registry.client.set_topic(registry.cmdinterpreter.current_channel, param)
 		return u'Saved it, dude! Ask with #whatsup or #wassup.'
 		
 
