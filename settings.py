@@ -27,6 +27,7 @@ MODULES = (                            # loaded modules (can be found in ./modul
 	'youtube',
 	'fun',
 	'usercommands',
+	'whatsup',
 	'history',
 	'feeds'
 )

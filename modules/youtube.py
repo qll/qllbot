@@ -18,8 +18,8 @@ def display_youtube_video_title(sender, channel, message):
 		handle = None
 		try:
 			handle = urllib2.urlopen('http://gdata.youtube.com/feeds/api/videos/%s?v=2' % result.group('id'))
-		except urllib2.HTTPError:
-			send_message(u'Error: Cannot open Youtube API.')
+		except urllib2.HTTPError as error:
+			send_message(u'%s' % error)
 
 		info = ElementTree()
 		try:
