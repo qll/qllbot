@@ -151,6 +151,7 @@ class QllIrcClient(QllClient):
 	def set_topic(self, channel, topic):
 		if registry.channels[channel].is_op(registry.username):
 			self.command_call('TOPIC %s :%s' % (channel, topic))
+			registry.channels[channel].topic = topic
 
 	def create_IrcUser(self, nickname, realname, host):
 		user = IrcUser()
