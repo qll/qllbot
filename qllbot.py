@@ -48,7 +48,7 @@ def main():
 				return
 			known_hosts[HOST] = e.sha1_fingerprint
 			add_known_host(HOST, e.sha1_fingerprint)
-			bot.connect(HOST, PORT, known_hosts, ENCODING)
+			bot.connect(HOST, PORT, known_hosts)
 		if SSL:
 			cipher = bot.irc.cipher()
 			log.system('Connected with {} using {} to {}'.format(cipher[1], cipher[0], HOST))

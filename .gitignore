@@ -2,4 +2,3 @@
 *.swp
 db.sqlite
 __pycache__/
-storage/
