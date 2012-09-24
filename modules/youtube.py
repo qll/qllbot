@@ -12,7 +12,6 @@ ATOM = 'http://www.w3.org/2005/Atom'
 @subscribe('channel_message')
 def display_youtube_video_title(sender, channel, message):
 	""" Checks every message sent for a youtube link and displays title and uploader information """
-	#http://youtu.be/Jdm6Fb65K0E
 	client = Bot().client
 	results = re.finditer(r'https?://(?:(?:www\.)?youtube\.com/watch\?.*?v=|youtu\.be/)(?P<id>[-_\w]{11})', message) 
 	output = []
