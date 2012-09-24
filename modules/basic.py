@@ -1,21 +1,23 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-import time
-from qllbot.Registry import *
+import time as time_module
+from lib.commands import command, pm_command, owner_command
+from lib.bot import Bot
 
 
-def get_time(param):
-	''' Returns current date and time in following format: dayname, day.month.year, hour:minute:second.
-You can supply your own format with: #time [format] (e.g. #time  d.%m.%Y -> 15.03.2011) '''
-	if param == '':
-		return time.strftime('%A, %d.%m.%Y, %H:%M:%S', time.localtime())
-	return time.strftime(param, time.localtime())
+@pm_command()
+@command()
+def time(param):
+	""" Returns current date and time in following format: dayname, day.month.year, hour:minute:second. """
+	return time_module.strftime('%A, %d.%m.%Y, %H:%M:%S', time_module.localtime())
 
+
+@pm_command()
+@owner_command()
 def say(param):
-	''' Echoes the given string (#say [text] -> [text]). '''
-	return param
-
-
-add_command('time', get_time)
-add_command('say', say)
+	''' Echoes the given string to the submitted channel (#say [channel] [text]). '''
+	client = Bot().client
+	param = param.split(' ', 1)
+	if len(param) < 2 or param[0] not in client.channels:
+		return 'Incorrect format or channel not known to bot. Try #say [channel] [text].'
+	client.say(param[0], param[1])
+	return ''
 

@@ -1,30 +1,23 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-from settings import *
-from qllbot.Registry import *
+import lib.commands
+from lib.commands import command, pm_command
 
 
-registry = Registry()
-
-
-def get_version(param):
-	''' Returns the version qllbot currently runs on. '''
-	return 'qllbot version %s' % VERSION
-
-def get_loaded_commands(param):
-	''' Returns all loaded commands. '''
+@command()
+@pm_command()
+def commands(param):
+	""" Returns all loaded commands. """
 	output = 'Loaded commands:\n'
-	return output + ', '.join(registry.cmdinterpreter.commands)
+	return output + ', '.join(lib.commands.pm_commands if lib.commands.is_pm else lib.commands.commands)
 
-def get_help(param):
-	''' Prints out the documentation string for a given command (e.g. #help help -> this text). '''
+
+@command()
+@pm_command()
+def help(param):
+	""" Prints out the documentation string for a given command (e.g. #help help -> this text). """
 	if param == '':
 		return 'Type in #commands for a list of commands or #help [command] for help concerning a command.'
-	if param in registry.cmdinterpreter.commands:	
-		return '#%s: %s' % (param, registry.cmdinterpreter.commands[param].__doc__)
+	cmdlist = lib.commands.pm_commands if lib.commands.is_pm else lib.commands.commands
+	if param in cmdlist:
+		return '#{}: {}'.format(param, cmdlist[param].__doc__)
 	return 'Command not found.'
 
-
-add_command('version',  get_version)
-add_command('commands', get_loaded_commands)
-add_command('help',     get_help)

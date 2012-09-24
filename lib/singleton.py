@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 # http://code.activestate.com/recipes/52558-the-singleton-pattern-implemented-with-python/
 class Singleton:

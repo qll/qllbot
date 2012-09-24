@@ -1,75 +1,45 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""
+qllbot settings file
 
-PROTOCOL = 'IRC'                       # SILC or IRC
+Edit this file to make qllbot suit your needs... :-)
+"""
 
-USERNAME = 'qllbot'                    # useraccount of the bot
-REALNAME = 'qllbot'                    # real name of the bot
-PASSWORD = ''                          # password of the bot useraccount
-OWNER    = 'qll'                       # username of the bot admin
+HOST = 'chat.freenode.net'	# Server address
+PORT = 7000					# Port of the IRC service
+SSL  = True					# Enable SSL?
 
-SERVER           = 'irc.freenode.net'  # Server address
-PORT             = ''                  # leave blank if you don't know (just for IRC)
-CHANNELS         = {                   # channels to connect to {'NAME': 'PASSWORD', ...}
+NICKNAME = 'qllbot'	# Nickname of the bot
+REALNAME = 'qllbot'	# Realname of the bot
+IDENT    = 'qllbot'	# Identifier of qllbot
+PASSWORD = ''		# Password of the bot useraccount (if given, the bot will make an attempt to identify with NickServ)
+OWNER    = 'qll'	# Nickname of the bot owner (for administrative commands)
+COMMAND_CHAR = '#'	# Char which prefixes all commands 
+
+CHANNELS = {		# Channels of the form {'name': 'password'}
 	'#qllbottest': '',
 }
 
-AUTO_OP_OWNER    = True                # if the bot gains sufficient rights +o the owner
-SEND_KEEP_ALIVE  = False               # Default: False. Some networks with with NAT
-                                       # require a socket to send data like every 20 seconds.
-                                       # Use this, if you get "silent" disconnects.
+# The following two options are only relevant if SSL is enabled.
+# You have two choices to identify the IRC server:
+# - If you want to use a CA certificate to check the SSL connection's certificate,
+#   insert the path to the CA certificate in CA_CERT.
+# - If you do not want to use a CA certificate, leave CA_CERT empty. qllbot is
+#   able to remember the SHA1-Fingerprint of the certificate the server responds
+#   with when you connect the first time. It will be stored as a (Host,
+#   SHA1-Fingerprint) Tuple in the known_hosts file. If the certificate ever
+#   changes qllbot will raise an InvalidCertException.
+CA_CERT = None	# Path to PEM-encoded certificate file or None
+KNOWN_HOSTS_FILE = 'storage/known_hosts'
 
-MODULES = (                            # loaded modules (can be found in ./modules)
-	'core',
-	'basic',
-	'admin',
-	'internet',
-	'youtube',
-	'fun',
-	'usercommands',
-	'whatsup',
-	'history',
-	'feeds'
-)
+DEBUG        = False						# In debug mode developer informations will be logged
+LOG_TO_FILE  = False						# Log to file?
+LOG_FILE     = 'storage/qllbot.log'			# Path to the log file
+LOG_MESSAGES = 2							# Log chat messages: 0 no, 1 yes, 2 only to console
+LOG_EVENTS   = 2							# Log events like join, leave: 0 no, 1 yes, 2 only to console
+LOG_SYSTEM   = 2							# Log events like connect, disconnect: 0 no, 1 yes, 2 only to console
+LOG_MSG_FMT  = '[{time}][{channel}] {nick}: {message}'	# log format for messages
+LOG_EVNT_FMT = '* [{time}] {event}'			# log format for events
+LOG_SSTM_FMT = '! [{time}] {event}'			# log format for system events
+LOG_TIME_FMT = '%d.%m.%Y %H:%M:%S'			# strftime format of log entries
 
-COMMAND_TOKEN = '#'                    # marks a command (default: #)
-VERSION  = '0.6.8'
-GREETING = 'qllbot v%s' % VERSION      # message sent when bot joins channel
-DEBUG    = False                       # print all socket messages to the console
-
-CACHE         = 'cache'                # cache directory
-PUBKEY_PATH   = '%s/silc.pub' % CACHE  # public key file path (for SILC)
-PRIVKEY_PATH  = '%s/silc.prv' % CACHE  # private key file path (for SILC)
-DATABASE_PATH = '%s/db.sqlite' % CACHE # path to database (will be created if it does not exist)
-
-LOGGER = 'ConsoleLogger'               # Currently you have following choices of Loggers:
-                                       # DummyLogger, ConsoleLogger, DbLogger
-DB_LOGGER_CONSOLE  = True              # if you use DbLogger this enables console output, too
-
-LOG_TIME_FORMAT    = '%H:%M:%S'
-LOG_MESSAGE_FORMAT = '[%(channel)s %(time)s] %(username)s: %(message)s'
-LOG_EVENT_FORMAT   = '* [%(time)s] %(event)s'
-
-PRINT_EXCEPTIONS = True                # print Exceptions to console
-CRASH_LOG_PATH   = ''                  # where to write crash logs (crash.[number].log)
-                                       # leave empty if you don't want crashlogs to be created
-
-### MODULES ###
-# internet
-WEATHER_LOCATION   = 'Bochum'          # default weather location (if #weather gets no parameters)
-WEATHER_IN_CELSIUS = True              # converts #weather results in °C
-GOOGLE_MAX_RESULTS = 3                 # displayed google results
-# fun
-ZOR_MAX = 3411                         # Highest known z0r.de id
-# usercommands
-USERCOMMANDS_TOKEN = '!'               # marks a usercommand
-# feeds
-NEWS_RESULTS = 3                       # maximum news results
-NEWS_FEEDS = {                         # allowed feeds with key (for #feed or #news command)
-	'faz':      'http://www.faz.net/s/Rub/Tpl~Epartner~SRss_~Ahomepageticker~E1.xml',
-	'zeit':     'http://newsfeed.zeit.de/index',
-	'spiegel':  'http://www.spiegel.de/index.rss',
-	'bbc':      'http://feeds.bbci.co.uk/news/rss.xml',
-	'aje':      'http://english.aljazeera.net/Services/Rss/?PostingId=2007731105943979989',
-	'guardian': 'http://feeds.guardian.co.uk/theguardian/rss'
-}
+ENCODING = 'utf-8'	# encoding the bot should use for incoming and outgoing messages

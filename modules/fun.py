@@ -1,22 +1,42 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import random
-from qllbot.Registry import *
-from settings import *
+from random import randint, choice
+from lib.bot import Bot
+from lib.commands import command, pm_command, get_channel
 
 
-def get_z0r(param):
-	''' Returns random z0r.de link. '''
-	return 'http://z0r.de/%d' %  random.randint(1, ZOR_MAX)
+ZOR_MAX = 4719
 
-def answer_yesno(param):
-	''' Answers yes or no to a question. '''
+
+@command(alias=['zor'])
+@pm_command(alias=['zor'])
+def z0r(param):
+	""" Returns random z0r.de link. """
+	return 'http://z0r.de/{}'.format(random.randint(1, ZOR_MAX))
+
+
+@command()
+@pm_command()
+def yesno(param):
+	""" Answers yes or no to a question. """
 	if random.randint(1, 10) >= 5:
 		return 'yes.'
 	else:
 		return 'no.'
 
 
-add_command('z0r', get_z0r)
-add_command('zor', get_z0r)
-add_command('yesno', answer_yesno)
+@command()
+def who(param):
+	""" #who wants help for this command? """
+	if param == '':
+		return
+	replacements = {'me': 'you', 'my': 'your', 'mine': 'yours'}
+	for a, b in replacements.items():
+		if ' {} '.format(a) in param or ' {}?'.format(a) in param:
+			param = param.replace(a, b)
+		elif ' {} '.format(b) in param or ' {}?'.format(b) in param:
+			param = param.replace(b, a)
+	param = param.replace('?', choice(('!', '.')))
+	users = Bot().client.channels[get_channel()].users
+	user = users[choice(list(users.keys()))]
+	return '{} {}'.format(user, param)
+	
