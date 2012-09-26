@@ -46,7 +46,7 @@ def execute_command(sender, command, param = None, commands = commands):
 				return commands[command](param);
 			return commands[command]('');
 		except Exception as e:
-			return 'If you happy and you know it: Exception!\n{}'.format(e)
+			return "If you're happy and you know it: Exception!\n{}".format(e)
 	return ''
 
 
