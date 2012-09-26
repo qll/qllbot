@@ -41,9 +41,12 @@ def execute_command(sender, command, param = None, commands = commands):
 		if command in owner_commands:
 			if sender.nickname != OWNER:
 				return 'You are not allowed to execute this command D:<'
-		if param:
-			return commands[command](param);
-		return commands[command]('');
+		try:
+			if param:
+				return commands[command](param);
+			return commands[command]('');
+		except Exception as e:
+			return 'If you happy and you know it: Exception!\n{}'.format(e)
 	return ''
 
 
