@@ -23,6 +23,7 @@ class Client:
 		('mode',            r'{user} MODE (?P<channel>#.+?) (?P<mode>.+?) (?P<user>.+)'),
 		('topic',           r'{user} TOPIC (?P<channel>#.+?) :(?P<topic>.*)'),
 		('kicked',          r'{user} KICK (?P<channel>#.+?) (?P<kicked>.+?) :(?P<message>.*)'),
+		('nick_change',     r'{user} NICK :(?P<nickname>.+)'),
 		('join_users',      r':.+? [\d]+ .+? [@=]{1} (?P<channel>#.+?) :(?P<users>.+)'),
 		('join_topic',      r':.+? [\d]+ .+? (?P<channel>#.+?) :(?P<topic>(?!End of /NAMES list\.).*)'),
 		# internally used events
@@ -51,6 +52,9 @@ class Client:
 	def join(self, channel, password = ''):
 		""" Joins IRC channel. """
 		self._bot.send('JOIN {0} {1}'.format(channel, password))
+	
+	def pong(self, code):
+		self._bot.send('PONG ' + code)
 	
 	def say(self, channel, message):
 		""" Says something in a IRC channel. """

@@ -12,7 +12,7 @@ bot = Bot()
 # essential
 @subscribe('ping')
 def pong(code):
-	bot.send('PONG ' + code)
+	bot.client.pong(code)
 
 
 # logging 
@@ -72,6 +72,18 @@ def kicked_user_from_channel(user, channel, kicked, message):
 def remove_user_from_all_channels(user, message):
 	for name, channel in bot.client.channels.items():
 		channel.remove_user(user)
+
+@subscribe('nick_change')
+def change_user_nickname(user, nickname):
+	for channel in bot.client.channels.values():
+		if user.nickname in channel.users:
+			old = channel.users.pop(user.nickname)
+			old.nickname = nickname
+			channel.users[nickname] = old
+			if (channel.is_op(user)):
+				channel.ops[channel.ops.index(user.nickname)] = nickname
+			if (channel.is_voiced(user)):
+				channel.voiced[channel.voiced.index(user.nickname)] = nickname
 
 @subscribe('mode')
 def recheck_user_role(user, channel, mode, receiver):
