@@ -7,6 +7,7 @@ from lib.events import subscribe
 
 
 ATOM = 'http://www.w3.org/2005/Atom'
+MRSS = 'http://search.yahoo.com/mrss/'
 
 
 @subscribe('channel_message')
@@ -27,10 +28,16 @@ def display_youtube_video_title(sender, channel, message):
 		except ExpatError:
 			client.say(channel, 'Error: Malformed XML.')
 		handle.close()
-		title    = info.findtext('{%s}title' % ATOM)
-		uploader = info.findtext('{%s}author/{%s}name' % (ATOM, ATOM)) 
+		title    = info.findtext('{{{0}}}title'.format(ATOM))
+		uploader = info.findtext('{{{0}}}author/{{{0}}}name'.format(ATOM)) 
+		duration = int(info.find('{{{0}}}group/{{{0}}}content'.format(MRSS)).get('duration', '0'))
+		hours = duration // 3600
+		minutes = (duration - hours * 3600) // 60
+		seconds = duration - hours * 3600 - minutes * 60
 		if title != None and uploader != None:
-			output.append("'{}' uploaded by {}".format(title, uploader))
+			output.append('{0} [{1:02d}:{2:02d}:{3:02d}] (by {4})'.format(
+				title, hours, minutes, seconds, uploader
+			))
 	if output:
 		# send message back to channel
 		client.say(channel, '\n'.join(output))
