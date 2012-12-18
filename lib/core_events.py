@@ -62,7 +62,9 @@ def remove_user_from_channel(user, channel):
 		# bot left channel
 		bot.client.channels.pop(channel)
 	else:
-		bot.client.channels[channel].remove_user(user)
+		channel = channel.split(' ')[0] if ':"' in channel else channel
+		if channel in bot.client.channels:
+			bot.client.channels[channel].remove_user(user)
 
 @subscribe('kicked')
 def kicked_user_from_channel(user, channel, kicked, message):
