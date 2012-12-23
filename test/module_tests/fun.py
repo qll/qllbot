@@ -38,4 +38,9 @@ class WhoCommandTestCase(TestCase):
 			modules.fun.who('game meeting atmega').split(' ', 1)[1],
 			'game meeting atmega'
 		)
-	
+
+
+class YesnoCommandTestCase(TestCase):
+	def test_yesno(self):
+		self.assertTrue(re.match(r'(yes|no).', modules.fun.yesno('')))
+		self.assertTrue(re.match(r'(yes|no).', modules.fun.yesno('question?')))

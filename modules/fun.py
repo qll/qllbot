@@ -19,10 +19,7 @@ def z0r(param):
 @pm_command()
 def yesno(param):
 	""" Answers yes or no to a question. """
-	if random.randint(1, 10) >= 5:
-		return 'yes.'
-	else:
-		return 'no.'
+	return choice(('yes', 'no')) + '.'
 
 
 @command()
