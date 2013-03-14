@@ -1,6 +1,6 @@
 # qllbot - Python powered IRC bot #
   
-License: [**BSD**](http://creativecommons.org/licenses/BSD/)
+License: [**BSD**](http://opensource.org/licenses/bsd-license.php)
 
 This bot requires Python 3 to work properly.
 
