@@ -43,3 +43,10 @@ LOG_SSTM_FMT = '! [{time}] {event}'			# log format for system events
 LOG_TIME_FMT = '%d.%m.%Y %H:%M:%S'			# strftime format of log entries
 
 ENCODING = 'utf-8'	# encoding the bot should use for incoming and outgoing messages
+
+
+# Possibility to overwrite all settings with a local settings file.
+import os.path
+if os.path.isfile('local_settings.py'):
+	from local_settings import *
+
