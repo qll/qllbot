@@ -30,7 +30,7 @@ class Client:
 		('nickname_in_use', r':.+? [\d]+ \* .+? :Nickname is already in use\.'),
 		('ping',            r'PING (?P<pong>.*)')
 	)
-	_user_regex = r':(?P<nick>.*?)!~(?P<ident>.*?)@(?P<host>.*?)'
+	_user_regex = r':(?P<nick>.*?)!~?(?P<ident>.*?)@(?P<host>.*?)'
 
 	def __init__(self, bot, nickname, realname, ident, password):
 		""" Compiles all regexes and takes nickname, ident and password. """
