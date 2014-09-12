@@ -6,9 +6,11 @@ import lib.events
 
 
 class TestEvents(unittest.TestCase):
-    def test_subscribe(self):
+    def setUp(self):
         TestEvents.successful = False
+        TestEvents.successful2 = False
 
+    def test_subscribe(self):
         @lib.events.subscribe('test')
         def subscribe_test():
             TestEvents.successful = True
@@ -17,8 +19,6 @@ class TestEvents(unittest.TestCase):
         self.assertTrue(TestEvents.successful)
 
     def test_subscribe_with_params(self):
-        TestEvents.successful = False
-
         @lib.events.subscribe('test2')
         def subscribe_test(successful):
             TestEvents.successful = successful
@@ -27,9 +27,6 @@ class TestEvents(unittest.TestCase):
         self.assertTrue(TestEvents.successful)
 
     def test_subscribe_two_with_params(self):
-        TestEvents.successful = False
-        TestEvents.successful2 = False
-
         @lib.events.subscribe('test3')
         def subscribe_test(successful):
             TestEvents.successful = successful
