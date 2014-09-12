@@ -1,25 +1,22 @@
-"""
-Implements an event system with some kind of an Observer pattern.
-"""
+"""Implements an event system."""
 
 
-events = {}
+_events = {}  # globally holds all event listeners
 
 
 class subscribe(object):
-	def __init__(self, event):
-		self.event = event
+    """Decorator to subscribe to an event. Usage: @subscribe('event_name')."""
 
-	def __call__(self, function):
-		if self.event in events:
-			events[self.event].append(function)
-		else:
-			events[self.event] = [function]
-		return function
+    def __init__(self, event):
+        self.event = event
+
+    def __call__(self, function):
+        _events.setdefault(self.event, []).append(function)
+        return function
 
 
-def call(event, param):
-	if event in events:
-		for function in events[event]:
-			function(*param)
-
+def call(event, params):
+    """Executes all event listeners of the specified event."""
+    if event in _events:
+        for function in _events[event]:
+            function(*params)
