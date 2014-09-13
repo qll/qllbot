@@ -15,8 +15,8 @@ CA_CERTS = None
 
 # bot identity details
 NICKNAME = 'qllbot'
-REALNAME = 'qllbot'
-IDENT = 'qllbot'
+# REALNAME = 'qllbot'
+# IDENT = 'qllbot'
 PASSWORD = ''
 OWNER = 'qll'
 COMMAND_CHAR = '#'
@@ -32,6 +32,7 @@ CHANNELS = {
 # rarely touched settings
 ENCODING = 'utf-8'
 KNOWN_HOSTS_FILE = 'storage/known_hosts'
+COMMAND_CHAR = '#'
 
 
 DEBUG = True
@@ -42,19 +43,21 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'standard': {
-            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+            'format': '[%(levelname)s-%(name)s]%(asctime)s: %(message)s',
+            'datefmt': '%d.%m.%Y/%H:%S',
         },
     },
     'handlers': {
         'default': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
+            'formatter': 'standard'
         },
     },
     'loggers': {
         '': {
             'handlers': ['default'],
-            'level': 'INFO',
+            'level': 'DEBUG',
             'propagate': True
         }
     }

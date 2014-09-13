@@ -6,13 +6,16 @@ Written by qll (github.com/qll), distributed under the BSD 2-Clause License.
 import argparse
 import settings
 import lib.bot
+import lib.core_events
 import logging
 import logging.config
 import os
+import ssl
+import sys
 
 
 def do_daemonize():
-    """Forks the program to the background and closes all file descriptors."""
+    """Fork the program to the background and closes all file descriptors."""
     fork()
     os.setsid()
     fork()
@@ -29,7 +32,7 @@ def do_daemonize():
 
 
 def write_pid_file(path):
-    """Writes a file with the process ID to the file system."""
+    """Write a file with the process ID to the file system."""
     with open(path, 'w') as f:
         f.write(str(os.getpid()))
 
@@ -42,7 +45,7 @@ def load_modules():
 
 
 def read_known_hosts():
-    """Reads {host: hash} mappings from the known_hosts file."""
+    """Read {host: hash} mappings from the known_hosts file."""
     try:
         if not os.path.isfile(settings.KNOWN_HOSTS_FILE):
             return {}
@@ -54,14 +57,21 @@ def read_known_hosts():
 
 
 def _add_setting(dict_, key):
-    """Adds a setting to the dict_ if it exists."""
+    """Add a setting to the dict_ if it exists."""
     try:
         dict_[key.lower()] = getattr(settings, key)
     except AttributeError:
         pass
 
 
+def append_known_host(host, hash_):
+    """Append a new (host, hash) pair to the known_hosts file."""
+    with open(settings.KNOWN_HOSTS_FILE, 'a') as f:
+        f.write('{} {}\n'.format(host, hash_))
+
+
 def main(daemonize=False, pid=None):
+    """Bootstrap all parts of the qllbot and start the main loop."""
     if daemonize:
         do_daemonize()
     if pid is not None:
@@ -75,24 +85,47 @@ def main(daemonize=False, pid=None):
     logging.config.dictConfig(settings.LOGGING)
     log = logging.getLogger(__name__)
 
+    log.debug('Loading all modules.')
     load_modules()
 
+    log.debug('Loading known_hosts file and setting bot configuration.')
     bot_args = {'known_hosts': read_known_hosts()}
     _add_setting(bot_args, 'PORT')
     _add_setting(bot_args, 'USE_SSL')
     _add_setting(bot_args, 'ENCODING')
     _add_setting(bot_args, 'CA_CERTS')
-    bot = lib.bot.Bot(settings.HOST, **bot_args)
 
-    log.info('Starting the bot.')
-    try:
-        bot.loop()
-    except KeyboardInterrupt:
-        log.info('Received KeyboardInterrupt.')
-    except:
-        log.exception('Exception in main loop:')
-    finally:
-        log.info('Exiting...')
+    running = False
+    while not running:
+        log.info('Starting the bot.')
+        bot = lib.bot.Bot(settings.HOST, **bot_args)
+        try:
+            running = True
+            bot.loop()
+        except lib.bot.UnknownCertError as e:
+            if daemonize:
+                log.error('Unknown certificate for %s (SHA512-Hash: %s).' %
+                          (e.host, e.sha512_hash))
+                sys.exit(1)
+            print('It seems as if you connect to this IRC the first time.')
+            print('Please verify these cryptographic hashes manually:\n')
+            print('SHA512-Hash: %s' % e.sha512_hash)
+            print('SHA1-Hash: %s\n' % e.sha1_hash)
+            decision = input('Do you want to add the host to the list of known'
+                             ' hosts and connect (j/n)? ').lower()
+            if decision != 'j':
+                return
+            bot_args['known_hosts'][settings.HOST] = e.sha512_hash
+            append_known_host(settings.HOST, e.sha512_hash)
+            running = False  # go back to the while loop
+        except ssl.CertificateError as e:
+            log.error(str(e))
+        except KeyboardInterrupt:
+            log.debug('Received KeyboardInterrupt.')
+        except:
+            log.exception('Exception in main loop:')
+        finally:
+            log.info('Exiting...')
 
 
 if __name__ == '__main__':

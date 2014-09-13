@@ -1,5 +1,7 @@
 import hashlib
+import lib.events
 import logging
+import queue
 import select
 import socket
 import ssl
@@ -26,7 +28,6 @@ class Bot(object):
     """Handles network communication of the bot."""
 
     timeout = 1
-    watchdog_threshold = 120
 
     def __init__(self, host, port=6667, encoding='utf-8', use_ssl=False,
                  ca_certs=None, known_hosts=None, max_reconnects=5):
@@ -42,9 +43,11 @@ class Bot(object):
         self.max_reconnects = max_reconnects
         self._buffer = ''
         self._socket = None
+        self._msg_queue = queue.Queue()
+        self._log = logging.getLogger(__name__)
 
     def _create_socket(self, use_ssl):
-        """Creates a TCP socket and adds in SSL if requested."""
+        """Create a TCP socket and adds in SSL if requested."""
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         if use_ssl:
             cert_reqs = ssl.CERT_REQUIRED if self.ca_certs else ssl.CERT_NONE
@@ -61,9 +64,12 @@ class Bot(object):
                 hash_ = self.known_hosts[self.host]
                 if hashlib.sha512(cert).hexdigest() != hash_:
                     self.disconnect()
-                    raise ssl.CertificateError('SSL certificate does not match'
-                                               'the one saved in the known '
-                                               'hosts storage.')
+                    e = ('SSL certificate does not match the one from the '
+                         'known_hosts file. Most likely the server has changed'
+                         ' its certificate and you have to delete the old line'
+                         ' from the known_hosts file. Be careful, this could '
+                         'also mean that you are being attacked!')
+                    raise ssl.CertificateError(e)
             else:
                 self.disconnect()
                 raise UnknownCertError(self.host,
@@ -82,14 +88,15 @@ class Bot(object):
                 if retries >= self.max_reconnects:
                     raise
                 time_sleep = (2 ** retries) * 5
-                logging.debug('Connection refused, retrying in %ds.' %
-                              time_sleep)
+                self._log.warning('Connection refused, retrying in %ds.' %
+                                  time_sleep)
                 time.sleep(time_sleep)
                 retries += 1
             else:
                 connected = True
         if self.use_ssl:
             self._validate_ssl_cert()
+        lib.events.call('connected', (self,))
 
     def reconnect(self):
         """Reconnect with the same credentials as before."""
@@ -102,13 +109,22 @@ class Bot(object):
             self._socket.close()
 
     def data_available(self):
-        """Checks if data is available on the socket with a timeout."""
+        """Check if data is available on the socket with a timeout."""
         rlist, _, __ = select.select([self._socket], [], [], self.timeout)
         return self._socket in rlist
 
+    def _send(self):
+        """Consume the internal message queue and send msgs to the server."""
+        if self._msg_queue.qsize() > 0:
+            self._socket.sendall(self._msg_queue.get() + b'\r\n')
+
     def send(self, msg):
-        """Send data to server after applying the specified encoding."""
-        self._socket.sendall(msg.encode(self.encoding, 'replace') + b'\r\n')
+        """Append a message to an internal messaging queue.
+
+        If the message contains multiple commands, it will be throttled.
+        """
+        for line in msg.strip().split('\r\n'):
+            self._msg_queue.put(line.encode(self.encoding, 'replace'))
 
     def _handle_data(self, data):
         """Buffer, decode and process incoming data."""
@@ -116,34 +132,18 @@ class Bot(object):
         if '\r\n' in self._buffer:
             messages = self._buffer.split('\r\n')
             for message in messages[:-1]:
-                log.debug(message)
-                # self.client.parse(message)
+                lib.events.call('raw_message', (self, message))
             self._buffer = messages[-1].rstrip()
-
-    def _call_watchdog(self):
-        """Is executed roughly all watchdog_treshold seconds."""
-        pass
-        # if sent_ping:
-        #     # server answered slower than watchdog_threshold seconds
-        #     self.reconnect()
-        #     sent_ping = False
-        # else:
-        #     self.send('PING :fuugg')
-        #     sent_ping = True
 
     def loop(self):
         self.connect()
-        watchdog_counter = 0
         while True:
             if self.data_available():
                 data = self._socket.recv(4096)
                 if not data:
+                    self._log.warning('Empty response: Reconnecting the bot.')
                     self.reconnect()
-                    watchdog_counter = 0
                     continue
-                else:
-                    self._handle_data(data)
-            watchdog_counter += 1
-            if watchdog_counter > self.watchdog_threshold:
-                watchdog_counter = 0
-                self._call_watchdog()
+                self._handle_data(data)
+            self._send()
+            lib.events.call('watchdog_tick', (self,))
