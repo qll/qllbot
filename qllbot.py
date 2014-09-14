@@ -16,11 +16,18 @@ import ssl
 import sys
 
 
+def fork():
+    """Forks and kills parent."""
+    pid = os.fork()
+    if pid > 0:
+        os._exit(0)
+
+
 def do_daemonize():
     """Fork the program to the background and closes all file descriptors."""
-    os.fork()
+    fork()
     os.setsid()
-    os.fork()
+    fork()
     # close file descriptors
     for fd in range(3):
         try:
