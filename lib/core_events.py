@@ -33,7 +33,7 @@ def modify_nickname(bot=None):
 
 
 # watchdog routines
-WATCHDOG_THRESHOLD = 60  # after how many ticks will a ping be sent out?
+WATCHDOG_THRESHOLD = 120  # after how many ticks will a ping be sent out?
 _watchdog_counter = 0
 _ping_sent = False  # True when a watchdog ping was sent out
 
@@ -86,7 +86,10 @@ def parse_raw_msg(bot, msg):
         return
     _log.debug('Calling IRC event: %s.' % event)
     kwargs['bot'] = bot
-    lib.events.call(event, kwargs=kwargs)
+    try:
+        lib.events.call(event, kwargs=kwargs)
+    except Exception:
+        _log.exception('Exception in event handler for event %s:' % event)
 
 
 # command invocation
