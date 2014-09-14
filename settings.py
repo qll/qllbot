@@ -9,17 +9,16 @@ HOST = 'chat.freenode.net'
 PORT = 7000  # default: 6667
 USE_SSL = True  # default: False
 
-
+# if you specify the path of the CA certificates, they will be used to verify
+# the SSL connection
 CA_CERTS = None
 
 
-# bot identity details
+# bot nickname
 NICKNAME = 'qllbot'
-# REALNAME = 'qllbot'
-# IDENT = 'qllbot'
-PASSWORD = ''
+
+# the owner is able to control the bot
 OWNER = 'qll'
-COMMAND_CHAR = '#'
 
 
 # which channels should the bot join on connect
@@ -29,16 +28,20 @@ CHANNELS = {
 }
 
 
-# rarely touched settings
+# message encoding
 ENCODING = 'utf-8'
+
+# paths
 KNOWN_HOSTS_FILE = 'storage/known_hosts'
 DATABASE_FILE = 'storage/db.sqlite'
+
+# prefix char for commands
 COMMAND_CHAR = '#'
 
 
+# https://docs.python.org/3.4/library/logging.config.html for details
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
     'formatters': {
         'standard': {
             'format': '[%(levelname)s-%(name)s]%(asctime)s: %(message)s',
@@ -51,6 +54,13 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'standard'
         },
+        # this probably is what you'd want in a daemonized setting:
+        # 'file': {
+        #     'level': 'INFO',
+        #     'class': 'logging.FileHandler',
+        #     'filename': 'storage/bot.log',
+        #     'formatter': 'standard'
+        # }
     },
     'loggers': {
         '': {

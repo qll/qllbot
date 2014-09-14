@@ -100,6 +100,7 @@ def main(daemonize=False, pid=None):
     # create files with 600 and dirs with 700 permissions
     os.umask(63)
 
+    settings.LOGGING['disable_existing_loggers'] = False
     logging.config.dictConfig(settings.LOGGING)
     log = logging.getLogger(__name__)
 
