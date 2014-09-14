@@ -13,7 +13,7 @@ class TestClickableModule(unittest.TestCase):
         lib.irc.say = lambda channel, msg: msg
         self.bot = lib.bot.Bot('localhost')
 
-    def test_link(self):
+    def test_broken_link(self):
         msg = lib.irc.Message('iceqll.eu/test')
         with unittest.mock.patch.object(self.bot, 'send') as mocked:
             modules.clickable.make_links_clickable(bot=self.bot, msg=msg)
@@ -23,6 +23,13 @@ class TestClickableModule(unittest.TestCase):
         msg = lib.irc.Message('just a.test')
         with unittest.mock.patch.object(self.bot, 'send') as mocked:
             e = 'Normal text should not be made clickable.'
+            mocked.side_effect = Exception(e)
+            modules.clickable.make_links_clickable(bot=self.bot, msg=msg)
+
+    def test_link(self):
+        msg = lib.irc.Message('https://www.youtube.com/watch?v=IAISUDbjXj0')
+        with unittest.mock.patch.object(self.bot, 'send') as mocked:
+            e = 'Clickable links should not be made clickable.'
             mocked.side_effect = Exception(e)
             modules.clickable.make_links_clickable(bot=self.bot, msg=msg)
 
