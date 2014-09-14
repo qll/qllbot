@@ -8,8 +8,16 @@ import sys
 @lib.events.subscribe('invite')
 def join_on_invite(bot=None, sender=None, channel=None):
     """If the bot owner invites the bot to a channel, it will join."""
-    if sender.nick == settings.OWNER:
+    if sender == settings.OWNER:
         bot.send(lib.irc.join(channel))
+
+
+@lib.events.subscribe('private_message')
+def snitch(bot=None, priv_msg=None):
+    """Tells the OWNER if the bot is contacted via PM and the exact content."""
+    if priv_msg.sender != settings.OWNER:
+        snitch_msg = '%s said to me: %s' % (priv_msg.sender, priv_msg.content)
+        bot.send(lib.irc.say_to(settings.OWNER, snitch_msg))
 
 
 @lib.cmd.command()

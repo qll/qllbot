@@ -36,9 +36,6 @@ DATABASE_FILE = 'storage/db.sqlite'
 COMMAND_CHAR = '#'
 
 
-DEBUG = True
-
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

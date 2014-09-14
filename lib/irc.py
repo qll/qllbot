@@ -73,11 +73,16 @@ class User(object):
         self.host = host
 
     def __eq__(self, user):
+        print(self)
+        print(user)
         if isinstance(user, User):
             return self.nick == user.nick
         if isinstance(user, str):
             return self.nick == user
         return False
+
+    def __ne__(self, user):
+        return not self.__eq__(user)
 
     def __str__(self):
         return self.nick
@@ -93,6 +98,9 @@ class Channel(object):
         if isinstance(channel, str):
             return self.name == channel
         return False
+
+    def __ne__(self, channel):
+        return not self.__eq__(channel)
 
     def __str__(self):
         return self.name
