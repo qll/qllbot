@@ -32,6 +32,7 @@ CHANNELS = {
 # rarely touched settings
 ENCODING = 'utf-8'
 KNOWN_HOSTS_FILE = 'storage/known_hosts'
+DATABASE_FILE = 'storage/db.sqlite'
 COMMAND_CHAR = '#'
 
 

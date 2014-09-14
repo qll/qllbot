@@ -30,7 +30,7 @@ class Bot(object):
     timeout = 1
 
     def __init__(self, host, port=6667, encoding='utf-8', use_ssl=False,
-                 ca_certs=None, known_hosts=None, max_reconnects=5):
+                 ca_certs=None, known_hosts=None, max_reconnects=5, db=None):
         if use_ssl and ca_certs is None and known_hosts is None:
             raise BotError('Expecting either ca_certs or known_hosts to be '
                            'set when SSL is enabled.')
@@ -41,6 +41,7 @@ class Bot(object):
         self.ca_certs = ca_certs
         self.known_hosts = known_hosts
         self.max_reconnects = max_reconnects
+        self.db = db
         self._buffer = ''
         self._socket = None
         self._msg_queue = queue.Queue()

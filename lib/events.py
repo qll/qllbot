@@ -5,6 +5,7 @@ A list of possible events with their parameters follows:
 Event Name      | Arguments
 ==========================================
 connected       | lib.bot.Bot
+new_db          | sqlite3.Connection
 raw_message     | lib.bot.Bot, str msg
 watchdog_tick   | lib.bot.Bot
 

@@ -7,9 +7,11 @@ import argparse
 import settings
 import lib.bot
 import lib.core_events
+import lib.events
 import logging
 import logging.config
 import os
+import sqlite3
 import ssl
 import sys
 
@@ -42,6 +44,15 @@ def load_modules():
     for module in os.listdir('modules/'):
         if not module.startswith('_') and module.endswith('.py'):
             __import__('modules.{}'.format(module.split('.')[0]))
+
+
+def connect_to_database():
+    """Connect to the SQLite database and call db_init event if necessary."""
+    db_existed = os.path.isfile(settings.DATABASE_FILE)
+    db = sqlite3.connect(settings.DATABASE_FILE)
+    if not db_existed:
+        lib.events.call('new_db', (db,))
+    return db
 
 
 def read_known_hosts():
@@ -88,8 +99,11 @@ def main(daemonize=False, pid=None):
     log.debug('Loading all modules.')
     load_modules()
 
+    log.debug('Connecting to SQLite database.')
+    db = connect_to_database()
+
     log.debug('Loading known_hosts file and setting bot configuration.')
-    bot_args = {'known_hosts': read_known_hosts()}
+    bot_args = {'known_hosts': read_known_hosts(), 'db': db}
     _add_setting(bot_args, 'PORT')
     _add_setting(bot_args, 'USE_SSL')
     _add_setting(bot_args, 'ENCODING')
@@ -99,6 +113,7 @@ def main(daemonize=False, pid=None):
     while not running:
         log.info('Starting the bot.')
         bot = lib.bot.Bot(settings.HOST, **bot_args)
+        lib.events.call('init', (bot,))
         try:
             running = True
             bot.loop()
