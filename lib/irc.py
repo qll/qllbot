@@ -104,7 +104,6 @@ class Message(object):
         self.private = private
         self.channel = None
         self.sender = None
-        self.bot = None
 
     def __str__(self):
         return self.content

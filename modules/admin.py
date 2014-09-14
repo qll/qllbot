@@ -23,3 +23,15 @@ def quit(msg):
     msg.bot.send(response)
     msg.bot.disconnect()
     sys.exit()
+
+
+@lib.cmd.command()
+def say(msg):
+    """Echoes the given string in the specified channel (#say channel text)."""
+    if msg.sender != settings.OWNER:
+        return 'No message sending for you, since you are not my owner :P'
+    try:
+        channel, message = msg.params.split(' ', 1)
+        msg.bot.send(lib.irc.say(channel, message))
+    except ValueError:
+        return 'Incorrect format. Try #say channel text.'

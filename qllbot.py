@@ -121,7 +121,8 @@ def main(daemonize=False, pid=None):
         except ssl.CertificateError as e:
             log.error(str(e))
         except KeyboardInterrupt:
-            log.debug('Received KeyboardInterrupt.')
+            log.debug('Received KeyboardInterrupt. Disconnecting.')
+            bot.disconnect()
         except:
             log.exception('Exception in main loop:')
         finally:

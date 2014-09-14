@@ -98,12 +98,16 @@ def invoke_command(bot=None, msg=None, priv_msg=None):
         msg = priv_msg
     if msg.sender.nick == settings.NICKNAME:
         return
-    if msg.content.startswith(settings.COMMAND_CHAR):
-        cmd = msg.content[1:].split(' ', 1)[0]
+    msg = lib.cmd.CommandMessage(msg, settings.COMMAND_CHAR)
+    if msg.is_command():
         _log.debug('Trying to invoke the %s command (private: %s).' %
-                   (cmd, msg.private))
+                   (msg.cmd, msg.private))
         msg.bot = bot
-        output = lib.cmd.execute(cmd, msg, private=msg.private)
+        try:
+            output = lib.cmd.execute(msg.cmd, msg, private=msg.private)
+        except Exception:
+            _log.exception('Exception in command %s:' % msg.cmd)
+            output = 'Well done - an exception occured! It was logged.'
         if output:
             response = (lib.irc.say_to(msg.sender, output) if msg.private else
                         lib.irc.say(msg.channel, output))

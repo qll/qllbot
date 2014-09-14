@@ -8,13 +8,15 @@ def commands(msg):
     return 'Available commands: %s' % ', '.join(cmd_dict)
 
 
-# @lib.cmd.command()
-# def help(msg):
-#     """Prints usage information for a command (#help help -> this text)."""
-#     param = msg.content.split(' ', 1)[1]
-#     if param == '':
-#         return 'Type in #commands for a list of commands or #help [command] for help concerning a command.'
-#     cmdlist = lib.commands.pm_commands if lib.commands.is_pm else lib.commands.commands
-#     if param in cmdlist:
-#         return '#{}: {}'.format(param, cmdlist[param].__doc__)
-#     return 'Command not found.'
+@lib.cmd.command()
+def help(msg):
+    """Prints usage information for a command (#help help -> this text)."""
+    if not msg.params:
+        return ('Type in %(cmdc)scommands for a list of commands or '
+                '%(cmdc)shelp [command] for help concerning a command.' %
+                {'cmdc': msg.cmd_char})
+    cmd_dict = lib.cmd.private_cmds if msg.private else lib.cmd.cmds
+    if msg.params in cmd_dict:
+        return '%s%s: %s' % (msg.cmd_char, msg.params,
+                             cmd_dict[msg.params].__doc__)
+    return 'Command %s%s not found.' % (msg.cmd_char, msg.params)
