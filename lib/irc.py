@@ -89,8 +89,9 @@ class User(object):
 
 
 class Channel(object):
-    def __init__(self, name):
+    def __init__(self, name, topic=''):
         self.name = name
+        self.topic = topic
 
     def __eq__(self, channel):
         if isinstance(channel, Channel):
