@@ -39,12 +39,10 @@ class command(object):
 
     def __call__(self, function):
         if self.alias is None:
-            alias = (function.__name__,)
-        elif isinstance(alias, str):
-            alias = (function.__name__, alias)
+            self.alias = (function.__name__,)
         else:
-            alias.append(function.__name__)
-        for name in alias:
+            self.alias.append(function.__name__)
+        for name in self.alias:
             cmds[name] = function
             if self.private:
                 private_cmds[name] = function
