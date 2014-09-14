@@ -18,9 +18,9 @@ import sys
 
 def do_daemonize():
     """Fork the program to the background and closes all file descriptors."""
-    fork()
+    os.fork()
     os.setsid()
-    fork()
+    os.fork()
     # close file descriptors
     for fd in range(3):
         try:
