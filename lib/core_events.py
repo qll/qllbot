@@ -96,9 +96,7 @@ def parse_raw_msg(bot=None, msg=None):
 
 @lib.event.subscribe('channel_message')
 @lib.event.subscribe('private_message')
-def invoke_command(bot=None, msg=None, priv_msg=None):
-    if priv_msg is not None:
-        msg = priv_msg
+def invoke_command(bot=None, msg=None):
     if msg.sender.nick == settings.NICKNAME:
         return
     msg = lib.cmd.CommandMessage(msg, settings.COMMAND_CHAR)

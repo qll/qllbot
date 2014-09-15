@@ -13,10 +13,10 @@ def join_on_invite(bot=None, sender=None, channel=None):
 
 
 @lib.event.subscribe('private_message')
-def snitch(bot=None, priv_msg=None):
+def snitch(bot=None, msg=None):
     """Tells the OWNER if the bot is contacted via PM and the exact content."""
-    if priv_msg.sender != settings.OWNER:
-        snitch_msg = '%s said to me: %s' % (priv_msg.sender, priv_msg.content)
+    if msg.sender != settings.OWNER:
+        snitch_msg = '%s said to me: %s' % (msg.sender, msg.content)
         bot.send(lib.irc.say_to(settings.OWNER, snitch_msg))
 
 
