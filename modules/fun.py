@@ -18,6 +18,14 @@ def yesno(msg):
     return random.choice(('yes', 'no')) + '.'
 
 
+@lib.cmd.command(alias=['or'])
+def choice(msg):
+    """Chooses between the given options: #choice O1 O2 O3 ..."""
+    if not msg.params:
+        return 'I choose not to choose when there are no options #deep'
+    return 'I choose %s' % random.choice(msg.params.split(' '))
+
+
 # @lib.cmd.command()
 # def who(msg):
 #     """#who wants help for this command?"""
