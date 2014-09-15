@@ -7,7 +7,7 @@ import argparse
 import settings
 import lib.bot
 import lib.core_events
-import lib.events
+import lib.event
 import logging
 import logging.config
 import os
@@ -58,7 +58,7 @@ def connect_to_database():
     db_existed = os.path.isfile(settings.DATABASE_FILE)
     db = sqlite3.connect(settings.DATABASE_FILE)
     if not db_existed:
-        lib.events.call('new_db', (db,))
+        lib.event.call('new_db', {'db': db})
     return db
 
 
@@ -121,7 +121,6 @@ def main(daemonize=False, pid=None):
     while not running:
         log.info('Starting the bot.')
         bot = lib.bot.Bot(settings.HOST, **bot_args)
-        lib.events.call('init', (bot,))
         try:
             running = True
             bot.loop()

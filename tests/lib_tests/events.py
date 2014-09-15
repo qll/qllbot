@@ -2,7 +2,7 @@ import sys
 import unittest
 
 sys.path.append('../../')
-import lib.events
+import lib.event
 
 
 class TestEvents(unittest.TestCase):
@@ -11,31 +11,31 @@ class TestEvents(unittest.TestCase):
         TestEvents.successful2 = False
 
     def test_subscribe(self):
-        @lib.events.subscribe('test')
+        @lib.event.subscribe('test')
         def subscribe_test():
             TestEvents.successful = True
 
-        lib.events.call('test', [])
+        lib.event.call('test')
         self.assertTrue(TestEvents.successful)
 
     def test_subscribe_with_params(self):
-        @lib.events.subscribe('test2')
-        def subscribe_test(successful):
+        @lib.event.subscribe('test2')
+        def subscribe_test(successful=False):
             TestEvents.successful = successful
 
-        lib.events.call('test2', [True])
+        lib.event.call('test2', {'successful': True})
         self.assertTrue(TestEvents.successful)
 
     def test_subscribe_two_with_params(self):
-        @lib.events.subscribe('test3')
-        def subscribe_test(successful):
+        @lib.event.subscribe('test3')
+        def subscribe_test(successful=False):
             TestEvents.successful = successful
 
-        @lib.events.subscribe('test3')
-        def subscribe_test2(successful):
+        @lib.event.subscribe('test3')
+        def subscribe_test2(successful=False):
             TestEvents.successful2 = successful
 
-        lib.events.call('test3', [True])
+        lib.event.call('test3', {'successful': True})
         self.assertTrue(TestEvents.successful)
         self.assertTrue(TestEvents.successful2)
 

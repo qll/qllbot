@@ -1,5 +1,4 @@
 """IRC protocol implementation."""
-import lib.events
 import re
 
 

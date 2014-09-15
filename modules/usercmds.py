@@ -1,6 +1,6 @@
 import contextlib
 import lib.cmd
-import lib.events
+import lib.event
 import lib.irc
 
 
@@ -10,15 +10,15 @@ USERCMD_CHAR = '!'
 _user_cmds = {}  # storage for all user commands during runtime
 
 
-@lib.events.subscribe('new_db')
-def create_usercmds_schema(db):
+@lib.event.subscribe('new_db')
+def create_usercmds_schema(db=None):
     """Creates the usercmds SQLite schema."""
     db.execute('CREATE TABLE usercmds (cmd TEXT PRIMARY KEY, response TEXT)')
     db.commit()
 
 
-@lib.events.subscribe('connected')
-def fetch_usercmds(bot):
+@lib.event.subscribe('connected')
+def fetch_usercmds(bot=None):
     """Fetches all user commands at the start of the bot."""
     with contextlib.closing(bot.db.cursor()) as c:
         c.execute('SELECT cmd, response FROM usercmds')
@@ -26,7 +26,7 @@ def fetch_usercmds(bot):
             _user_cmds[cmd] = response
 
 
-@lib.events.subscribe('channel_message')
+@lib.event.subscribe('channel_message')
 def invoke_usercmd(bot=None, msg=None):
     if msg.content.startswith(USERCMD_CHAR) and msg.content[1:] in _user_cmds:
         bot.send(lib.irc.say(msg.channel, _user_cmds[msg.content[1:]]))

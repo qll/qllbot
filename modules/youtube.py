@@ -1,4 +1,4 @@
-import lib.events
+import lib.event
 import lib.irc
 import re
 import urllib.error
@@ -16,7 +16,7 @@ NS = {
 }
 
 
-@lib.events.subscribe('channel_message')
+@lib.event.subscribe('channel_message')
 def display_youtube_metadata(bot=None, msg=None):
     """Checks every message for youtube links and displays meta information."""
     if 'nospoiler' in msg.content:

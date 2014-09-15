@@ -1,5 +1,5 @@
 import lib.cmd
-import lib.events
+import lib.event
 import lib.irc
 import random
 import settings
@@ -8,7 +8,7 @@ import settings
 GREETINGS = ('hi', 'hey ho', 'yoyo!', 'sup\'')
 
 
-@lib.events.subscribe('join')
+@lib.event.subscribe('join')
 def say_hello(bot=None, sender=None, channel=None):
     """Greets the channel when joining it."""
     if sender == settings.NICKNAME:

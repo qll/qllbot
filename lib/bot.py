@@ -1,5 +1,5 @@
 import hashlib
-import lib.events
+import lib.event
 import logging
 import queue
 import select
@@ -61,20 +61,21 @@ class Bot(object):
             ssl.match_hostname(cert, self.host)
         else:
             cert = self._socket.getpeercert(True)  # get binary cert
+            sha512_hash = hashlib.sha512(cert).hexdigest()
             if self.host in self.known_hosts:
                 hash_ = self.known_hosts[self.host]
-                if hashlib.sha512(cert).hexdigest() != hash_:
+                if sha512_hash != hash_:
                     self.disconnect()
                     e = ('SSL certificate does not match the one from the '
                          'known_hosts file. Most likely the server has changed'
                          ' its certificate and you have to delete the old line'
                          ' from the known_hosts file. Be careful, this could '
-                         'also mean that you are being attacked!')
+                         'also mean that you are being attacked!\nOld hash: '
+                         '%s\nNew hash: %s' % (hash_, sha512_hash))
                     raise ssl.CertificateError(e)
             else:
                 self.disconnect()
-                raise UnknownCertError(self.host,
-                                       hashlib.sha512(cert).hexdigest(),
+                raise UnknownCertError(self.host, sha512_hash,
                                        hashlib.sha1(cert).hexdigest())
 
     def connect(self):
@@ -97,7 +98,7 @@ class Bot(object):
                 connected = True
         if self.use_ssl:
             self._validate_ssl_cert()
-        lib.events.call('connected', (self,))
+        lib.event.call('connected', {'bot': self})
 
     def reconnect(self):
         """Reconnect with the same credentials as before."""
@@ -133,7 +134,7 @@ class Bot(object):
         if '\r\n' in self._buffer:
             messages = self._buffer.split('\r\n')
             for message in messages[:-1]:
-                lib.events.call('raw_message', (self, message))
+                lib.event.call('raw_message', {'bot': self, 'msg': message})
             self._buffer = messages[-1].rstrip()
 
     def loop(self):
@@ -147,4 +148,4 @@ class Bot(object):
                     continue
                 self._handle_data(data)
             self._send()
-            lib.events.call('watchdog_tick', (self,))
+            lib.event.call('watchdog_tick', {'bot': self})

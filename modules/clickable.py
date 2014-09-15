@@ -1,9 +1,9 @@
-import lib.events
+import lib.event
 import lib.irc
 import re
 
 
-@lib.events.subscribe('channel_message')
+@lib.event.subscribe('channel_message')
 def make_links_clickable(bot=None, msg=None):
     """Checks every message for unclickable links and makes them clickable."""
     matches = re.finditer(r' (\w+\.[a-zA-Z]+\/[^\s]*) ', ' %s ' % msg.content)

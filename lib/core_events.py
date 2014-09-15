@@ -1,5 +1,5 @@
 import lib.cmd
-import lib.events
+import lib.event
 import lib.irc
 import logging
 import settings
@@ -10,20 +10,20 @@ _log = logging.getLogger(__name__)
 
 # connection event handlers
 
-@lib.events.subscribe('connected')
-def identify(bot):
+@lib.event.subscribe('connected')
+def identify(bot=None):
     _log.info('Identifying as %s.' % settings.NICKNAME)
     bot.send(lib.irc.identify(settings.NICKNAME, settings.HOST))
 
 
-@lib.events.subscribe('connected')
-def join_channels(bot):
+@lib.event.subscribe('connected')
+def join_channels(bot=None):
     for channel, password in settings.CHANNELS.items():
         _log.debug('Joining %s.' % channel)
         bot.send(lib.irc.join(channel, password))
 
 
-@lib.events.subscribe('nickname_in_use')
+@lib.event.subscribe('nickname_in_use')
 def modify_nickname(bot=None):
     """Append underscores if the nickname is already in use."""
     settings.NICKNAME = '%s_' % settings.NICKNAME
@@ -38,21 +38,21 @@ _watchdog_counter = 0
 _ping_sent = False  # True when a watchdog ping was sent out
 
 
-@lib.events.subscribe('raw_message')
-def reset_watchdog_counter(bot, msg):
+@lib.event.subscribe('raw_message')
+def reset_watchdog_counter(bot=None, msg=None):
     """When receiving messages from the server we can reset the watchdog."""
     global _watchdog_counter
     _watchdog_counter = 0
 
 
-@lib.events.subscribe('ping')
+@lib.event.subscribe('ping')
 def answer_ping(bot=None, code=''):
     """Answer the server's PINGs."""
     bot.send(lib.irc.pong(code))
 
 
-@lib.events.subscribe('watchdog_tick')
-def send_watchdog_ping(bot):
+@lib.event.subscribe('watchdog_tick')
+def send_watchdog_ping(bot=None):
     """If no activity was measured for a long enough time, we send a PING."""
     global _watchdog_counter, _ping_sent
     _watchdog_counter += 1
@@ -68,7 +68,7 @@ def send_watchdog_ping(bot):
             _ping_sent = True
 
 
-@lib.events.subscribe('pong')
+@lib.event.subscribe('pong')
 def receive_watchdog_pong(bot=None, code=''):
     """The received PONG answers our watchdog PING."""
     global _watchdog_counter, _ping_sent
@@ -78,8 +78,8 @@ def receive_watchdog_pong(bot=None, code=''):
 
 # IRC message parsing and event generation
 
-@lib.events.subscribe('raw_message')
-def parse_raw_msg(bot, msg):
+@lib.event.subscribe('raw_message')
+def parse_raw_msg(bot=None, msg=None):
     event, kwargs = lib.irc.parse(msg)
     if event is None:
         _log.debug('Unknown message: %s' % msg)
@@ -87,15 +87,15 @@ def parse_raw_msg(bot, msg):
     _log.debug('Calling IRC event: %s.' % event)
     kwargs['bot'] = bot
     try:
-        lib.events.call(event, kwargs=kwargs)
+        lib.event.call(event, kwargs=kwargs)
     except Exception:
         _log.exception('Exception in event handler for event %s:' % event)
 
 
 # command invocation
 
-@lib.events.subscribe('channel_message')
-@lib.events.subscribe('private_message')
+@lib.event.subscribe('channel_message')
+@lib.event.subscribe('private_message')
 def invoke_command(bot=None, msg=None, priv_msg=None):
     if priv_msg is not None:
         msg = priv_msg
