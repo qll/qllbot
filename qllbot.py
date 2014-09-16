@@ -145,7 +145,7 @@ def main(daemonize=False, pid=None):
         except KeyboardInterrupt:
             log.debug('Received KeyboardInterrupt. Disconnecting.')
             bot.disconnect()
-        except:
+        except Exception:
             log.exception('Exception in main loop:')
         finally:
             log.info('Exiting...')
