@@ -2,7 +2,6 @@ import lib.cmd
 import lib.event
 import lib.irc
 import settings
-import sys
 
 
 @lib.event.subscribe('invite')
@@ -25,12 +24,9 @@ def quit(msg):
     """Shuts down the bot. Only possible if you are the owner of the bot!"""
     if msg.sender != settings.OWNER:
         return 'I would love to but you are not my owner...'
-    text = 'Goodbye :)'
-    response = (lib.irc.say_to(msg.sender, text) if msg.private else
-                lib.irc.say(msg.channel, text))
-    msg.bot.send(response)
+    msg.bot.send(lib.irc.quit('Goodbye :)'))
     msg.bot.disconnect()
-    sys.exit()
+    raise SystemExit()
 
 
 @lib.cmd.command()

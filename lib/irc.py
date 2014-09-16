@@ -170,6 +170,11 @@ def say_to(user, msg):
     return say(user, msg)
 
 
+def quit(msg=''):
+    """Return a valid QUIT message with an optional reason."""
+    return 'QUIT :%s' % msg
+
+
 def parse(msg):
     """Parses an IRC message using regular expressions."""
     for event, func, regex in _irc_regex:
