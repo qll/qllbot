@@ -32,7 +32,8 @@ def mensa(msg=None):
     if desired_date.hour > 15:  # after 15:00: show next day
         desired_date += datetime.timedelta(days=1)
     if desired_date.weekday() >= 5:  # saturday and sunday: show monday
-        desired_date += datetime.timedelta(days=desired_date.weekday() - 5)
+        days_to_monday = 2 - (desired_date.weekday() % 5)
+        desired_date += datetime.timedelta(days=days_to_monday)
     day_name = _to_weekday(desired_date.weekday())
     desired_date_str = '%02d.%02d.' % (desired_date.day, desired_date.month)
     for entry in tree.findall('{%(atom)s}entry' % NS):
