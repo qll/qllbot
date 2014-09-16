@@ -95,12 +95,15 @@ class Channel(object):
         self.topic = topic
         self.users = []
         self.ops = []
+        self.voiced = []
 
-    def part_user(self, user):
+    def part(self, user):
         if user in self.users:
             self.users.remove(user)
         if user in self.ops:
             self.ops.remove(user)
+        if user in self.voiced:
+            self.voiced.remove(user)
 
     def __eq__(self, channel):
         if isinstance(channel, Channel):
@@ -210,10 +213,6 @@ def _fold_channel(func):
     return _wrap
 
 
-def _return_kwargs(**kwargs):
-    return kwargs
-
-
 @_fold_sender
 @_fold_channel
 def _handle_channel_message(sender=None, channel=None, msg=''):
@@ -237,22 +236,37 @@ def _handle_join(sender=None, channel=None):
 @_fold_sender
 @_fold_channel
 def _handle_part(sender=None, channel=None):
-    channel.part_user(sender)
+    channel.part(sender)
     return {'sender': sender, 'channel': channel}
 
 
 @_fold_sender
 def _handle_quit(sender=None, msg=''):
     for channel in _channels.values():
-        channel.part_user(sender)
+        channel.part(sender)
     return {'sender': sender, 'msg': msg}
 
 
-_handle_invite = _fold_sender(_fold_channel(_return_kwargs))
+@_fold_sender
+@_fold_channel
+def _handle_invite(**kwargs):
+    return kwargs
 
 
-# TODO: parse user modes
-_handle_mode = _fold_channel(_return_kwargs)
+@_fold_sender
+@_fold_channel
+def _handle_mode(sender=None, channel=None, mode='', receiver=''):
+    if receiver in _users:
+        if mode == '+o' and _users[receiver] not in channel.ops:
+            channel.ops.append(_users[receiver])
+        elif mode == '-o' and _users[receiver] in channel.ops:
+            channel.ops.remove(_users[receiver])
+        elif mode == '+v' and _users[receiver] not in channel.voiced:
+            channel.voiced.append(_users[receiver])
+        elif mode == '-v' and _users[receiver] in channel.voiced:
+            channel.voiced.remove(_users[receiver])
+    return {'sender': sender, 'channel': channel, 'mode': mode,
+            'receiver': receiver}
 
 
 @_fold_sender
@@ -269,7 +283,7 @@ def _handle_topic(sender=None, channel=None, topic=''):
 def _handle_kick(sender=None, channel=None, kicked='', msg=''):
     if kicked not in _users:
         raise IndexError('Never heard of the kicked user %s.' % kicked)
-    channel.part_user(_users[kicked])
+    channel.part(_users[kicked])
     return {'sender': sender, 'channel': channel, 'kicked': _users[kicked],
             'msg': msg}
 
@@ -288,7 +302,8 @@ def _handle_join_users(channel=None, users=''):
     """Populates the channel users and ops lists."""
     for nick in users.split(' '):
         op = nick.startswith('@')
-        if op:
+        voice = nick.startswith('+')
+        if op or voice:
             nick = nick[1:]
         if nick not in _users:
             _users[nick] = User(nick)
@@ -296,6 +311,8 @@ def _handle_join_users(channel=None, users=''):
             channel.users.append(_users[nick])
         if op and _users[nick] not in channel.ops:
             channel.ops.append(_users[nick])
+        if voice and _users[nick] not in channel.voiced:
+            channel.voiced.append(_users[nick])
     return {'channel': channel, 'users': users}
 
 
