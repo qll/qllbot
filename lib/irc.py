@@ -11,7 +11,7 @@ _irc_regex = (
         r'%(user)s PRIVMSG (?P<channel>#[^ ]+) :(?P<msg>.*)'
     ), (
         'private_message', '_handle_private_message',
-        r'%(user)s PRIVMSG [^ ]+ :(?P<priv_msg>.*)'
+        r'%(user)s PRIVMSG [^ ]+ :(?P<msg>.*)'
     ), (
         'join', '_handle_join',
         r'%(user)s JOIN :{0,1}(?P<channel>#[^\s]+)'
