@@ -33,6 +33,12 @@ class TestClickableModule(unittest.TestCase):
             mocked.side_effect = Exception(e)
             modules.clickable.make_links_clickable(bot=self.bot, msg=msg)
 
+    def test_subdomain(self):
+        msg = lib.irc.Message('a.b.com/c')
+        with unittest.mock.patch.object(self.bot, 'send') as mocked:
+            modules.clickable.make_links_clickable(bot=self.bot, msg=msg)
+            mocked.assert_called_with('Clickable: http://a.b.com/c')
+
 
 if __name__ == '__main__':
     unittest.main()

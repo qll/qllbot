@@ -47,3 +47,9 @@ def cmd(msg):
     msg.bot.db.commit()
     _user_cmds[cmd] = response
     return 'User command stored. Usage: %s%s' % (USERCMD_CHAR, cmd)
+
+
+@lib.cmd.command()
+def listcmds(msg):
+    """Lists all user commands."""
+    return ', '.join('!%s' % k for k in _user_cmds)
