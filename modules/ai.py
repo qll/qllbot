@@ -5,7 +5,7 @@ import random
 import settings
 
 
-GREETINGS = ('hi', 'hey ho', 'yoyo!', 'sup\'')
+GREETINGS = ('hi', 'hey ho', 'yoyo!', '\'sup?')
 
 
 @lib.event.subscribe('join')
