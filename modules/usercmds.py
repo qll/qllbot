@@ -32,7 +32,7 @@ def invoke_usercmd(bot=None, msg=None):
         bot.send(lib.irc.say(msg.channel, _user_cmds[msg.content[1:]]))
 
 
-@lib.cmd.command()
+@lib.cmd.command(alias=['usercmd'])
 def cmd(msg):
     """Creates or changes an user command (#usercmd name response)."""
     if not msg.params or ' ' not in msg.params:
@@ -52,4 +52,20 @@ def cmd(msg):
 @lib.cmd.command()
 def listcmds(msg):
     """Lists all user commands."""
+    if not _user_cmds:
+        return 'Nope. No commands yet. Add one!'
     return ', '.join('!%s' % k for k in _user_cmds)
+
+
+@lib.cmd.command()
+def delcmd(msg):
+    """Delete a user command (#delcmd name)"""
+    if not msg.params:
+        return 'Usage: #delcmd name'
+    cmd = msg.params
+    if cmd not in _user_cmds:
+        return 'Command not found. Wanna list them all? #listcmds'
+    msg.bot.db.execute('DELETE FROM usercmds WHERE cmd=?', (cmd,))
+    msg.bot.db.commit()
+    del _user_cmds[cmd]
+    return 'Command %s deleted. Bye bye' % cmd
