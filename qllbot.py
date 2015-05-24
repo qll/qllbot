@@ -46,6 +46,13 @@ def write_pid_file(path):
         f.write(str(os.getpid()))
 
 
+def create_directories(dirs):
+    """Try to create each directory given in the dirs set."""
+    for dir_ in dirs:
+        if not os.path.isdir(dir_):
+            os.makedirs(dir_)
+
+
 def load_modules():
     """Imports all modules from the modules directory."""
     for module in os.listdir('modules/'):
@@ -103,6 +110,10 @@ def main(daemonize=False, pid=None):
     settings.LOGGING['disable_existing_loggers'] = False
     logging.config.dictConfig(settings.LOGGING)
     log = logging.getLogger(__name__)
+
+    log.debug('Creating all directories.')
+    file_settings = (settings.KNOWN_HOSTS_FILE, settings.DATABASE_FILE)
+    create_directories(set(os.path.dirname(path) for path in file_settings))
 
     log.debug('Loading all modules.')
     load_modules()
