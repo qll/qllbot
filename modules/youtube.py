@@ -3,17 +3,12 @@ import lib.irc
 import re
 import urllib.error
 import urllib.request
-import xml.etree.ElementTree
-import xml.parsers.expat
+import settings
+import json
 
 
-API_URI = 'http://gdata.youtube.com/feeds/api/videos/%(id)s?v=2'
-
-
-NS = {
-    'atom': 'http://www.w3.org/2005/Atom',
-    'mrss': 'http://search.yahoo.com/mrss/',
-}
+API_URI = ('https://www.googleapis.com/youtube/v3/videos?id=%s'
+           '&part=contentDetails,snippet&key=' + settings.YOUTUBE_API_KEY)
 
 
 @lib.event.subscribe('channel_message')
@@ -24,21 +19,19 @@ def display_youtube_metadata(bot=None, msg=None):
     matches = re.finditer(r'https?://(?:(?:www\.)?youtube\.com/watch\?.*?v='
                           '|youtu\.be/)(?P<id>[-_\w]{11})', msg.content)
     output = []
-    for match in matches:
-        info = xml.etree.ElementTree.ElementTree()
-        with urllib.request.urlopen(API_URI % match.groupdict()) as h:
-            info.parse(h)
-        title = info.findtext('{%(atom)s}title' % NS)
-        uploader = info.findtext('{%(atom)s}author/{%(atom)s}name' % NS)
-        if title is None or uploader is None:
-            raise Exception('Cannot find either title and/or uploader.')
-        duration = info.find('{%(mrss)s}group/{%(mrss)s}content' % NS)
-        duration = int(duration.get('duration', '0'))
-        hours = duration // 3600
-        minutes = (duration - hours * 3600) // 60
-        seconds = duration - hours * 3600 - minutes * 60
-        output.append('%s [%02d:%02d:%02d] (by %s)' % (title, hours, minutes,
-                                                       seconds, uploader))
+    ids = [match.group('id') for match in matches]
+    with urllib.request.urlopen(API_URI % ','.join(ids)) as h:
+        data = json.loads(h.read().decode("utf-8"))
+    for vid in data["items"]:
+        duration = re.search(
+            r'PT((?P<hours>\d{1,2})H)?(?P<minutes>\d{1,2})'
+             'M(?P<seconds>\d{1,2})S', vid["contentDetails"]["duration"])
+        params = {k: int(v) for k, v in duration.groupdict(default=0).items()}
+        params["title"] = vid["snippet"]["title"]
+        params["uploader"] = vid["snippet"]["channelTitle"]
+        output.append(
+            '%(title)s [%(hours)02d:%(minutes)02d:%(seconds)02d] '
+            '(by %(uploader)s)' % params)
     if output:
         # send message back to channel
         bot.send(lib.irc.say(msg.channel, '\n'.join(output)))
