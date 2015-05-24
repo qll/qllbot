@@ -28,7 +28,7 @@ CHANNELS = {
 }
 
 # Youtube API key
-YOUTUBE_API_KEY = 'AIzaSyCZafpBK-ky7It4d4ZT2nC0n8Yx3yQ8Ygg'
+YOUTUBE_API_KEY = 'AIzaSyDD3WqC6Wp2TECBiaCDK8cIFplmKpbMq2c'
 
 # message encoding
 ENCODING = 'utf-8'
