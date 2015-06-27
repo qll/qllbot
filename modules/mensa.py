@@ -6,10 +6,9 @@ import xml.etree.ElementTree
 import xml.parsers.expat
 
 
-API_URI = ('http://www.akafoe.de/gastronomie/mensen/ruhr-universitaet-bochum/'
-           '?mid=1&tx_akafoespeiseplan_mensadetails%5Baction%5D=feed&tx_akafo'
-           'espeiseplan_mensadetails%5Bcontroller%5D=AtomFeed&cHash=131da6102'
-           'c27a372087f39f4c47be1e9')
+API_URI = ('http://www.akafoe.de/speiseplaene-der-mensen/ruhr-universitaet-bo'
+           'chum/?mid=1&tx_akafoespeiseplan_mensadetails%5Baction%5D=feed&tx_'
+           'akafoespeiseplan_mensadetails%5Bcontroller%5D=AtomFeed')
 
 
 NS = {
