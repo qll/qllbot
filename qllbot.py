@@ -104,8 +104,8 @@ def main(daemonize=False, pid=None):
 
     # change cwd to the director of this file
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    # create files with 600 and dirs with 700 permissions
-    os.umask(63)
+    # created files should not be readable/writable/executable by others
+    os.umask(0o7)
 
     settings.LOGGING['disable_existing_loggers'] = False
     logging.config.dictConfig(settings.LOGGING)
