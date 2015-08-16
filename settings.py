@@ -72,3 +72,12 @@ LOGGING = {
         }
     }
 }
+
+
+# try to load local settings which overwrite only some of the settings in here.
+# this is an alternative to modifying this file if you want your git copy to
+# stay unmodified (for easy git pull updates etc)
+try:
+    from local_settings import *
+except ImportError:
+    pass
