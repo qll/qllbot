@@ -8,7 +8,7 @@ private_cmds = {}
 
 class CommandMessage(lib.irc.Message):
     def __init__(self, msg, cmd_char):
-        super().__init__(msg.content, msg.private)
+        super().__init__(msg.content, private=msg.private)
         self.cmd_char = cmd_char
         self.channel = msg.channel
         self.sender = msg.sender

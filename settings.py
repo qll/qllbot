@@ -7,6 +7,7 @@ Edit this file to make qllbot suit your needs :-)
 # connection details
 HOST = 'chat.freenode.net'
 PORT = 7000  # default: 6667
+PASSWORD = ''  # server password, leave empty if not needed
 USE_SSL = True  # default: False
 
 # if you specify the path of the CA certificates, they will be used to verify

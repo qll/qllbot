@@ -9,6 +9,12 @@ _log = logging.getLogger(__name__)
 
 
 # connection event handlers
+@lib.event.subscribe('connected')
+def auth_to_server(bot=None):
+    if settings.PASSWORD:
+        _log.debug('Sending server password.')
+        bot.send(lib.irc.password(settings.PASSWORD))
+
 
 @lib.event.subscribe('connected')
 def identify(bot=None):

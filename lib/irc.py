@@ -145,6 +145,10 @@ def ping(code):
     return 'PING %s' % code
 
 
+def password(pw):
+    return 'PASS %s' % pw
+
+
 def pong(code):
     return 'PONG %s' % code
 
